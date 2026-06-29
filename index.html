@@ -5,38 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bill Processor™ - Official Site</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
-        header { border-bottom: 2px solid #d32f2f; padding-bottom: 20px; }
-        h1 { color: #d32f2f; margin-bottom: 5px; }
-        .developer { font-style: italic; color: #666; margin-top: 0; }
-        h2 { color: #222; margin-top: 30px; }
-        .footer { margin-top: 50px; font-size: 0.8em; color: #666; border-top: 1px solid #ccc; padding-top: 20px; }
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --dark: #212121;
+            --light: #f5f5f5;
+            --gray: #757575;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--dark); background-color: #fff; scroll-behavior: smooth; }
+        
+        /* Navigation */
+        nav { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .logo { font-size: 1.4rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .nav-links { display: flex; list-style: none; }
+        .nav-links li { margin-left: 20px; }
+        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Hero Section */
+        header { background: linear-gradient(135deg, #f9f9f9 0%, #f1f1f1 100%); padding: 140px 20px 80px; text-align: center; border-bottom: 4px solid var(--primary); }
+        .hero-container { max-width: 800px; margin: 0 auto; }
+        header h1 { font-size: 3rem; color: var(--dark); margin-bottom: 10px; }
+        .developer { font-size: 1.1rem; color: var(--gray); margin-bottom: 20px; font-weight: 400; }
+        .tagline { font-size: 1.4rem; color: var(--primary); font-weight: 600; }
+
+        /* Content Sections */
+        section { max-width: 900px; margin: 60px auto; padding: 0 20px; scroll-margin-top: 80px; }
+        h2 { font-size: 2rem; color: var(--dark); margin-bottom: 20px; position: relative; padding-bottom: 10px; }
+        h2::after { content: ''; position: absolute; left: 0; bottom: 0; width: 50px; height: 3px; background-color: var(--primary); }
+        p { margin-bottom: 15px; font-size: 1.05rem; color: #444; }
+        ul { margin-bottom: 20px; padding-left: 20px; color: #444; }
+        li { margin-bottom: 8px; }
+
+        /* Cards for UI structure */
+        .card { background: var(--light); border-left: 4px solid var(--primary); padding: 20px; margin-top: 20px; border-radius: 0 8px 8px 0; }
+
+        /* Footer */
+        footer { background: var(--dark); color: #fff; padding: 40px 20px; text-align: center; margin-top: 100px; font-size: 0.9rem; }
+        footer p { color: #bbb; margin-bottom: 10px; }
+        footer .trademark { font-size: 0.8rem; color: #888; }
     </style>
 </head>
 <body>
 
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">Bill Processor™</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#support">Support</a></li>
+                <li><a href="#privacy">Privacy Policy</a></li>
+                <li><a href="#terms">Terms</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <header>
-        <h1>Bill Processor™</h1>
-        <p class="developer">Developed by Abdullah Bin Satter</p>
-        <p><strong>Manage your bills, smarter.</strong></p>
+        <div class="hero-container">
+            <h1>Bill Processor™</h1>
+            <p class="developer">Developed by Abdullah Bin Satter</p>
+            <p class="tagline">Manage your bills, smarter.</p>
+        </div>
     </header>
 
-    <main>
+    <section id="about">
         <h2>About Bill Processor™</h2>
-        <p>Bill Processor™ helps you seamlessly organize, track, and process your incoming financial documents and bills directly within your Workspace environment.</p>
-        
+        <p>Bill Processor™ is designed to optimize your financial workflows. By integrating directly into your Google Workspace™ environment, our tool empowers users to dynamically organize, analyze, and process statement documents, receipts, and recurring invoices without ever leaving their cloud environment.</p>
+        <p>Key Functionalities:</p>
+        <ul>
+            <li>Automated data structural mapping for incoming bills.</li>
+            <li>Direct workspace pipeline integration for error-free entries.</li>
+            <li>Clean, native UI formatting tailored to your administrative needs.</li>
+        </ul>
+    </section>
+
+    <section id="support">
         <h2>Support & Contact</h2>
-        <p>For technical assistance, feature requests, or troubleshooting, please reach out to our support team at: <strong>support@gcpautomation.store</strong></p>
+        <p>We are dedicated to providing a smooth user experience. If you encounter bugs, deployment errors, or want to request custom feature additions, our support infrastructure is ready to help.</p>
+        <div class="card">
+            <p><strong>Customer Support Email:</strong> support@gcpautomation.store</p>
+            <p>Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
+        </div>
+    </section>
 
+    <section id="privacy">
         <h2>Privacy Policy</h2>
-        <p>We take your privacy seriously. Bill Processor™ only accesses data explicitly granted by the user to process bills. We do not store, sell, or share your personal data with third parties. All authentication and data access tokens are managed securely through your Google Account permissions.</p>
-    </main>
+        <p><strong>Last Updated: June 2026</strong></p>
+        <p>This Privacy Policy outlines how Bill Processor™ handles user data. Our core data principle is absolute transparency and minimal data acquisition.</p>
+        
+        <h3>1. Data Collection and Usage</h3>
+        <p>Bill Processor™ explicitly limits data interaction. The application only accesses data endpoints dynamically granted by the user during explicit operational actions. We do not run background scraping processes on your system files.</p>
+        
+        <h3>2. Data Sharing and Transfer</h3>
+        <p>We strictly prohibit the sale, external transfer, or commercial monetization of user data. All processing operations occur locally or directly within authenticated secure parameters of your Google Cloud™ project scopes. No information is passed to third-party advertising brokers.</p>
+        
+        <h3>3. Data Retention and Deletion</h3>
+        <p>We do not maintain independent databases to store persistent user data records. Session tokens and operational keys are temporary and dynamically managed. Users can instantly revoke authentication access permissions at any time via their standard Google Account security panel settings.</p>
+    </section>
 
-    <div class="footer">
-        <p>Google Workspace™ and Google Cloud™ are trademarks of Google LLC.</p>
-        <p>Bill Processor™ is an independent software tool and is not affiliated with Google LLC.</p>
+    <section id="terms">
+        <h2>Terms of Service</h2>
+        <p>Welcome to Bill Processor™. By utilizing our application software, you explicitly agree to comply with the following operational terms:</p>
+        <ul>
+            <li><strong>Permitted Use:</strong> The software is provided for legal document management and accounting optimization routines. You agree not to exploit the platform endpoints maliciously.</li>
+            <li><strong>Account Responsibility:</strong> Access authentication is managed exclusively via secure Google Single Sign-On (SSO). You remain responsible for maintaining the privacy of your host organization credentials.</li>
+            <li><strong>Disclaimer of Warranty:</strong> The service is provided "as-is." We strive for peak performance stability but do not warrant uninterrupted operation under catastrophic network constraints.</li>
+        </ul>
+    </section>
+
+    <footer>
         <p>&copy; 2026 Abdullah Bin Satter. All rights reserved.</p>
-    </div>
+        <p class="trademark">Google Workspace™, Google Sheets™, Google Cloud™, and Gmail™ are registered trademarks of Google LLC. Bill Processor™ operates as an independent automation utility and maintains no structural or proprietary affiliation with Google LLC.</p>
+    </footer>
 
 </body>
 </html>
