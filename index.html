@@ -36,8 +36,11 @@
         h2 { font-size: 2rem; color: var(--dark); margin-bottom: 20px; position: relative; padding-bottom: 10px; }
         h2::after { content: ''; position: absolute; left: 0; bottom: 0; width: 50px; height: 3px; background-color: var(--primary); }
         p { margin-bottom: 15px; font-size: 1.05rem; color: #444; }
-        ul { margin-bottom: 20px; padding-left: 20px; color: #444; }
-        li { margin-bottom: 8px; }
+        ul, ol { margin-bottom: 20px; padding-left: 20px; color: #444; }
+        li { margin-bottom: 8px; font-size: 1.05rem; }
+
+        /* Setup Steps */
+        .setup-step { background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 6px; }
 
         /* Cards for UI structure */
         .card { background: var(--light); border-left: 4px solid var(--primary); padding: 20px; margin-top: 20px; border-radius: 0 8px 8px 0; }
@@ -55,6 +58,7 @@
             <a href="#" class="logo">Bill Processor™</a>
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
+                <li><a href="#setup">Setup Guide</a></li>
                 <li><a href="#support">Support</a></li>
                 <li><a href="#privacy">Privacy Policy</a></li>
                 <li><a href="#terms">Terms</a></li>
@@ -72,27 +76,31 @@
 
     <section id="about">
         <h2>About Bill Processor™</h2>
-        <p>Bill Processor™ is designed to optimize your financial workflows. By integrating directly into your Google Workspace™ environment, our tool empowers users to dynamically organize, analyze, and process statement documents, receipts, and recurring invoices without ever leaving their cloud environment.</p>
-        <p>Key Functionalities:</p>
-        <ul>
-            <li>Automated data structural mapping for incoming bills.</li>
-            <li>Direct workspace pipeline integration for error-free entries.</li>
-            <li>Clean, native UI formatting tailored to your administrative needs.</li>
-        </ul>
+        <p>Bill Processor™ optimizes your financial workflows. Integrated directly into your Google Workspace™ environment, our tool empowers users to seamlessly organize, analyze, and process statement documents, receipts, and invoices without leaving their cloud environment.</p>
+    </section>
+
+    <section id="setup">
+        <h2>Application Setup Guide</h2>
+        <p>Follow these instructions to configure Bill Processor™ after installation:</p>
+        <ol>
+            <li class="setup-step"><strong>Install the App:</strong> Click the "Install" button on the Google Workspace Marketplace™ listing page.</li>
+            <li class="setup-step"><strong>Grant Permissions:</strong> Review and accept the OAuth authorization prompts to securely connect your workspace pipelines.</li>
+            <li class="setup-step"><strong>Initialize Integration:</strong> Open your Google Workspace™ container (such as Google Sheets™ or the sidebar layout), find the Bill Processor™ icon, and start scanning your financial layouts instantly.</li>
+        </ol>
     </section>
 
     <section id="support">
         <h2>Support & Contact</h2>
         <p>We are dedicated to providing a smooth user experience. If you encounter bugs, deployment errors, or want to request custom feature additions, our support infrastructure is ready to help.</p>
         <div class="card">
-            <p><strong>Customer Support Email:</strong> assist@gcpautomation.store</p>
+            <p><strong>Customer Support Email:</strong> support@gcpautomation.store</p>
             <p>Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
         </div>
     </section>
 
     <section id="privacy">
         <h2>Privacy Policy</h2>
-        <p><strong>Last Updated: June 2026</strong></p>
+        <p><strong>Last Updated: July 2026</strong></p>
         <p>This Privacy Policy outlines how Bill Processor™ handles user data. Our core data principle is absolute transparency and minimal data acquisition.</p>
         
         <h3>1. Data Collection and Usage</h3>
