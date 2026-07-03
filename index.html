@@ -1,66 +1,125 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Processor - Official Site</title>
+    <title>GCP Automation Studio - Bill Processor & Reconciler</title>
     <style>
         :root {
-            --primary: #d32f2f;
-            --primary-dark: #b71c1c;
-            --dark: #212121;
-            --light: #f5f5f5;
-            --gray: #757575;
+            --primary: #00e5ff;
+            --primary-dark: #00b0ff;
+            --dark-bg: #0b0f19;
+            --card-bg: #111827;
+            --nav-bg: #111827;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border-glow: rgba(0, 229, 255, 0.2);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--dark); background-color: #fff; scroll-behavior: smooth; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: var(--text-main); 
+            background-color: var(--dark-bg); 
+            scroll-behavior: smooth; 
+        }
         
         /* Navigation */
-        nav { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
-        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
-        .logo { font-size: 1.4rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        nav { background: var(--nav-bg); border-bottom: 1px solid rgba(255,255,255,0.05); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .logo { font-size: 1.4rem; font-weight: bold; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--primary); }
         .nav-links { display: flex; list-style: none; }
         .nav-links li { margin-left: 20px; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; transition: color 0.3s; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; transition: color 0.3s; }
         .nav-links a:hover { color: var(--primary); }
 
         /* Hero Section */
-        header { background: linear-gradient(135deg, #f9f9f9 0%, #f1f1f1 100%); padding: 140px 20px 80px; text-align: center; border-bottom: 4px solid var(--primary); }
+        header { padding: 160px 20px 60px; text-align: center; background: radial-gradient(circle at center, rgba(0,229,255,0.05) 0%, transparent 70%); }
         .hero-container { max-width: 800px; margin: 0 auto; }
-        header h1 { font-size: 3rem; color: var(--dark); margin-bottom: 10px; }
-        .developer { font-size: 1.1rem; color: var(--gray); margin-bottom: 20px; font-weight: 400; }
-        .tagline { font-size: 1.4rem; color: var(--primary); font-weight: 600; }
+        header h1 { font-size: 3.5rem; margin-bottom: 10px; font-weight: 800; letter-spacing: -1px; }
+        .developer { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; font-weight: 400; }
+        .tagline { font-size: 1.5rem; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Content Sections */
-        section { max-width: 900px; margin: 60px auto; padding: 0 20px; scroll-margin-top: 80px; }
-        h2 { font-size: 2rem; color: var(--dark); margin-bottom: 20px; position: relative; padding-bottom: 10px; }
-        h2::after { content: ''; position: absolute; left: 0; bottom: 0; width: 50px; height: 3px; background-color: var(--primary); }
-        p { margin-bottom: 15px; font-size: 1.05rem; color: #444; }
-        ul, ol { margin-bottom: 20px; padding-left: 20px; color: #444; }
-        li { margin-bottom: 8px; font-size: 1.05rem; }
+        section { max-width: 1200px; margin: 80px auto; padding: 0 20px; scroll-margin-top: 100px; }
+        h2 { font-size: 2.2rem; color: var(--text-main); margin-bottom: 25px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        h2::after { content: ''; display: inline-block; flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--primary), transparent); margin-left: 15px; }
+        h3 { font-size: 1.3rem; color: var(--primary); margin: 25px 0 10px; font-weight: 600; }
+        p { margin-bottom: 15px; font-size: 1.05rem; color: var(--text-muted); }
+        ul, ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; font-size: 1.05rem; }
 
-        /* Setup Steps */
-        .setup-step { background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 6px; }
+        /* Asset Download Bar */
+        .download-bar { 
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.7), rgba(17, 24, 39, 0.7)); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 20px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .download-info { text-align: left; }
+        .download-info h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: #F3F4F6; }
+        .download-info p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+        .download-buttons { display: flex; gap: 10px; }
+        .btn-download { 
+            text-decoration: none; 
+            padding: 10px 16px; 
+            background-color: #1f2937; 
+            border: 1px solid #374151; 
+            color: #e5e7eb; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            transition: all 0.2s; 
+        }
+        .btn-download:hover { border-color: var(--primary); color: #fff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
 
-        /* Cards for UI structure */
-        .card { background: var(--light); border-left: 4px solid var(--primary); padding: 20px; margin-top: 20px; border-radius: 0 8px 8px 0; }
+        /* Live App UI Container Frame */
+        .web-app-frame-wrapper { 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0, 229, 255, 0.15); 
+            border: 1px solid rgba(0, 229, 255, 0.3); 
+            background-color: var(--card-bg); 
+        }
+        .frame-header { background-color: #1f2937; padding: 12px 20px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .frame-dots { display: flex; gap: 6px; margin-right: 15px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background-color: #ef4444; }
+        .dot-y { background-color: #f59e0b; }
+        .dot-g { background-color: #10b981; }
+        .frame-title { font-size: 0.85rem; color: var(--text-muted); font-family: monospace; letter-spacing: 0.5px; }
+
+        /* Setup Steps Cards */
+        .setup-step { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; border-radius: 8px; list-style-type: none; border-left: 4px solid var(--primary); }
+        .setup-step strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+
+        /* Context Information Blocks */
+        .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         /* Footer */
-        footer { background: var(--dark); color: #fff; padding: 40px 20px; text-align: center; margin-top: 100px; font-size: 0.9rem; }
-        footer p { color: #bbb; margin-bottom: 10px; }
-        footer .trademark { font-size: 0.8rem; color: #888; }
+        footer { background: var(--card-bg); color: #fff; padding: 60px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 120px; font-size: 0.9rem; }
+        footer p { color: var(--text-muted); margin-bottom: 12px; }
+        footer .trademark { font-size: 0.8rem; color: #4b5563; max-width: 900px; margin: 20px auto 0 auto; line-height: 1.5; }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="nav-container">
-            <a href="#" class="logo">Bill Processor</a>
+            <a href="#" class="logo">GCP Automation <span>Studio</span></a>
             <ul class="nav-links">
+                <li><a href="#app-workspace">Workspace Platform</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#setup">Setup Guide</a></li>
                 <li><a href="#support">Support</a></li>
-                <li><a href="#privacy">Privacy Policy</a></li>
+                <li><a href="#privacy">Privacy</a></li>
                 <li><a href="#terms">Terms</a></li>
             </ul>
         </div>
@@ -69,10 +128,46 @@
     <header>
         <div class="hero-container">
             <h1>Bill Processor</h1>
-            <p class="developer">Developed by Abdullah Bin Satter</p>
+            <p class="developer">Automated Core Infrastructure • Engineered by Abdullah Bin Satter</p>
             <p class="tagline">Manage your bills, smarter.</p>
         </div>
     </header>
+
+    <section id="app-workspace">
+        <h2>Automated Bank Reconciliation Engine</h2>
+        <p style="margin-bottom: 30px;">Cross-reference transaction variables dynamically directly inside your secure Google Cloud project scopes.</p>
+        
+        <div class="download-bar">
+            <div class="download-info">
+                <h3>📺 YouTube Tutorial Test Dataset</h3>
+                <p>Download these matching pre-formatted templates to explore the engine's capability.</p>
+            </div>
+            <div class="download-buttons">
+                <a href="bank.csv" download class="btn-download">📥 Download Tutorial Bank.csv</a>
+                <a href="GL.csv" download class="btn-download">📥 Download Tutorial GL.csv</a>
+            </div>
+        </div>
+
+        <div class="web-app-frame-wrapper">
+            <div class="frame-header">
+                <div class="frame-dots">
+                    <span class="dot dot-r"></span>
+                    <span class="dot dot-y"></span>
+                    <span class="dot dot-g"></span>
+                </div>
+                <span class="frame-title">reconciler_engine_v1.0.exe</span>
+            </div>
+
+            <iframe 
+                src="https://script.google.com/macros/s/AKfycbza_dgT_Pzu4XE5sLuaBI2vMKBbYPZj040n6tVShno3wjuqTSo_b37F5aOar8pX_VfcQQ/exec" 
+                width="100%" 
+                height="750px" 
+                style="border: none; display: block; background-color: #FFFFFF;"
+                allow="controlled-frame-origin sandbox">
+            </iframe>
+        </div>
+        <p style="margin-top: 25px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
+    </section>
 
     <section id="about">
         <h2>About Bill Processor</h2>
@@ -81,11 +176,11 @@
 
     <section id="setup">
         <h2>Application Setup Guide</h2>
-        <p>Follow these instructions to configure Bill Processor after installation:</p>
+        <p style="margin-bottom: 25px;">Follow these instructions to configure Bill Processor after installation:</p>
         <ol>
-            <li class="setup-step"><strong>Install the App:</strong> Click the "Install" button on the Google Workspace Marketplace™ listing page.</li>
-            <li class="setup-step"><strong>Grant Permissions:</strong> Review and accept the OAuth authorization prompts to securely connect your workspace pipelines.</li>
-            <li class="setup-step"><strong>Initialize Integration:</strong> Open your Google Workspace™ container (such as Google Sheets™ or the sidebar layout), find the Bill Processor icon, and start scanning your financial layouts instantly.</li>
+            <li class="setup-step"><strong>1. Install the App</strong> Click the "Install" button on the Google Workspace Marketplace™ listing page.</li>
+            <li class="setup-step"><strong>2. Grant Permissions</strong> Review and accept the OAuth authorization prompts to securely connect your workspace pipelines.</li>
+            <li class="setup-step"><strong>3. Initialize Integration</strong> Open your Google Workspace™ container (such as Google Sheets™ or the sidebar layout), find the Bill Processor icon, and start scanning your financial layouts instantly.</li>
         </ol>
     </section>
 
@@ -93,8 +188,9 @@
         <h2>Support & Contact</h2>
         <p>We are dedicated to providing a smooth user experience. If you encounter bugs, deployment errors, or want to request custom feature additions, our support infrastructure is ready to help.</p>
         <div class="card">
-            <p><strong>Customer Support Email:</strong> support@gcpautomation.store</p>
-            <p>Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
+            <p style="color: #fff; font-weight: 600; margin-bottom: 5px;">Customer Support Gateway:</p>
+            <p style="color: var(--primary); font-family: monospace; font-size: 1.1rem; margin-bottom: 10px;">assist@gcpautomation.store</p>
+            <p style="margin: 0; font-size: 0.95rem;">Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
         </div>
     </section>
 
