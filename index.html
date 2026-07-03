@@ -29,6 +29,7 @@
             color: var(--text-main); 
             background-color: var(--dark-bg); 
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         
         /* Navigation Header Bar */
@@ -36,8 +37,10 @@
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 1.4rem; font-weight: bold; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .logo span { color: var(--primary); }
-        .support-link { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
-        .support-link:hover { color: var(--primary); }
+        .nav-links { display: flex; list-style: none; }
+        .nav-links li { margin-left: 20px; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
 
         /* Studio Title / Header */
         header { padding: 120px 20px 30px; text-align: center; background: radial-gradient(circle at center, rgba(0,229,255,0.04) 0%, transparent 60%); }
@@ -122,6 +125,20 @@
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
+        /* Unified Content Sections Styling */
+        section { max-width: 1200px; margin: 80px auto; padding: 0 20px; scroll-margin-top: 100px; }
+        h2 { font-size: 2rem; color: var(--text-main); margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        h2::after { content: ''; display: inline-block; flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--primary), transparent); margin-left: 15px; }
+        h3 { font-size: 1.25rem; color: var(--primary); margin: 25px 0 10px; font-weight: 600; }
+        p { margin-bottom: 15px; font-size: 1.02rem; color: var(--text-muted); }
+        ul, ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; font-size: 1.02rem; }
+
+        /* Setup Cards / Information Panels */
+        .setup-step { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; border-radius: 8px; list-style-type: none; border-left: 4px solid var(--primary); }
+        .setup-step strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+        .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -129,11 +146,11 @@
         }
 
         /* Footer System */
-        footer { margin-top: 100px; padding: 40px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background-color: var(--card-bg); font-size: 0.85rem; }
-        footer p { color: var(--text-muted); margin-bottom: 5px; }
-        .legal-links { margin-top: 10px; }
-        .legal-links a { color: var(--primary); text-decoration: none; margin: 0 10px; font-weight: 500; }
-        .legal-links a:hover { text-decoration: underline; }
+        footer { margin-top: 120px; padding: 60px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background-color: var(--card-bg); font-size: 0.88rem; }
+        footer p { color: var(--text-muted); margin-bottom: 8px; }
+        .legal-links { margin-top: 15px; }
+        .legal-links a { color: var(--text-muted); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.2s; }
+        .legal-links a:hover { color: var(--primary); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -141,7 +158,13 @@
     <nav>
         <div class="nav-container">
             <a href="#" class="logo">GCP Automation <span>Studio</span></a>
-            <a href="mailto:assist@gcpautomation.store" class="support-link">📥 Contact Support</a>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#setup">Setup Guide</a></li>
+                <li><a href="#support">Support</a></li>
+                <li><a href="#privacy">Privacy</a></li>
+                <li><a href="#terms">Terms</a></li>
+            </ul>
         </div>
     </nav>
 
@@ -158,33 +181,36 @@
     </div>
 
     <main id="reconciler-demo" class="tab-content active">
-        <div class="download-bar">
-            <div class="download-info">
-                <h3>📺 YouTube Tutorial Sandbox</h3>
-                <p>Grab the verification CSV sets to run the calculation layout variables live.</p>
-            </div>
-            <div class="download-buttons">
-                <a href="bank.csv" download class="btn-download">Download Bank.csv</a>
-                <a href="GL.csv" download class="btn-download">Download GL.csv</a>
-            </div>
-        </div>
-
-        <div class="web-app-frame-wrapper">
-            <div class="frame-header">
-                <div class="frame-dots">
-                    <span class="dot dot-r"></span>
-                    <span class="dot dot-y"></span>
-                    <span class="dot dot-g"></span>
+        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="download-bar">
+                <div class="download-info">
+                    <h3>📺 YouTube Tutorial Sandbox</h3>
+                    <p>Grab the verification CSV sets to run the calculation layout variables live.</p>
                 </div>
-                <span class="frame-title">reconciler_engine_v1.0.exe</span>
+                <div class="download-buttons">
+                    <a href="bank.csv" download class="btn-download">Download Bank.csv</a>
+                    <a href="GL.csv" download class="btn-download">Download GL.csv</a>
+                </div>
             </div>
-            <iframe 
-                src="https://script.google.com/macros/s/AKfycbza_dgT_Pzu4XE5sLuaBI2vMKBbYPZj040n6tVShno3wjuqTSo_b37F5aOar8pX_VfcQQ/exec" 
-                width="100%" 
-                height="750px" 
-                style="border: none; display: block; background-color: #FFFFFF;"
-                allow="controlled-frame-origin sandbox">
-            </iframe>
+
+            <div class="web-app-frame-wrapper">
+                <div class="frame-header">
+                    <div class="frame-dots">
+                        <span class="dot dot-r"></span>
+                        <span class="dot dot-y"></span>
+                        <span class="dot dot-g"></span>
+                    </div>
+                    <span class="frame-title">reconciler_engine_v1.0.exe</span>
+                </div>
+                <iframe 
+                    src="https://script.google.com/macros/s/AKfycbza_dgT_Pzu4XE5sLuaBI2vMKBbYPZj040n6tVShno3wjuqTSo_b37F5aOar8pX_VfcQQ/exec" 
+                    width="100%" 
+                    height="750px" 
+                    style="border: none; display: block; background-color: #FFFFFF;"
+                    allow="controlled-frame-origin sandbox">
+                </iframe>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
         </div>
     </main>
 
@@ -208,11 +234,63 @@
         </div>
     </main>
 
+    <section id="about">
+        <h2>About the Studio</h2>
+        <p>GCP Automation Studio optimizes your financial workflows. Integrated directly into your Google Workspace™ environment, our tools empower users to seamlessly organize, analyze, and process statement documents, receipts, and invoices without leaving their cloud environment.</p>
+    </section>
+
+    <section id="setup">
+        <h2>Application Setup Guide</h2>
+        <p style="margin-bottom: 25px;">Follow these instructions to configure our extensions after installation:</p>
+        <ol>
+            <li class="setup-step"><strong>1. Install the App</strong> Click the "Install" button on the Google Workspace Marketplace™ listing page.</li>
+            <li class="setup-step"><strong>2. Grant Permissions</strong> Review and accept the OAuth authorization prompts to securely connect your workspace pipelines.</li>
+            <li class="setup-step"><strong>3. Initialize Integration</strong> Open your Google Workspace™ container (such as Google Sheets™ or the sidebar layout), find the processor icon, and start scanning your financial layouts instantly.</li>
+        </ol>
+    </section>
+
+    <section id="support">
+        <h2>Support & Contact</h2>
+        <p>We are dedicated to providing a smooth user experience. If you encounter bugs, deployment errors, or want to request custom feature additions, our support infrastructure is ready to help.</p>
+        <div class="card">
+            <p style="color: #fff; font-weight: 600; margin-bottom: 5px;">Customer Support Gateway:</p>
+            <p style="color: var(--primary); font-family: monospace; font-size: 1.1rem; margin-bottom: 10px;">assist@gcpautomation.store</p>
+            <p style="margin: 0; font-size: 0.95rem;">Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
+        </div>
+    </section>
+
+    <section id="privacy">
+        <h2>Privacy Policy</h2>
+        <p><strong>Last Updated: July 2026</strong></p>
+        <p>This Privacy Policy outlines how our suite handles user data. Our core data principle is absolute transparency and minimal data acquisition.</p>
+        
+        <h3>1. Data Collection and Usage</h3>
+        <p>Our tools explicitly limit data interaction. Applications only access data endpoints dynamically granted by the user during explicit operational actions. We do not run background scraping processes on your system files.</p>
+        
+        <h3>2. Data Sharing and Transfer</h3>
+        <p>We strictly prohibit the sale, external transfer, or commercial monetization of user data. All processing operations occur locally or directly within authenticated secure parameters of your Google Cloud™ project scopes. No information is passed to third-party advertising brokers.</p>
+        
+        <h3>3. Data Retention and Deletion</h3>
+        <p>We do not maintain independent databases to store persistent user data records. Session tokens and operational keys are temporary and dynamically managed. Users can instantly revoke authentication access permissions at any time via their standard Google Account security panel settings.</p>
+    </section>
+
+    <section id="terms">
+        <h2>Terms of Service</h2>
+        <p>By utilizing our application software, you explicitly agree to comply with the following operational terms:</p>
+        <ul>
+            <li><strong>Permitted Use:</strong> The software is provided for legal document management and accounting optimization routines. You agree not to exploit the platform endpoints maliciously.</li>
+            <li><strong>Account Responsibility:</strong> Access authentication is managed exclusively via secure Google Single Sign-On (SSO). You remain responsible for maintaining the privacy of your host organization credentials.</li>
+            <li><strong>Disclaimer of Warranty:</strong> The service is provided "as-is." We strive for peak performance stability but do not warrant uninterrupted operation under catastrophic network constraints.</li>
+        </ul>
+    </section>
+
     <footer>
         <p>&copy; 2026 Abdullah Bin Satter. All rights reserved.</p>
-        <p style="color: #4b5563; font-size: 0.8rem; max-width: 800px; margin: 5px auto 15px auto;">Google Workspace™, Google Sheets™, and Google Cloud™ are registered trademarks of Google LLC. This studio operational context functions as an independent software deployment endpoint utility platform.</p>
+        <p style="color: #4b5563; font-size: 0.8rem; max-width: 900px; margin: 5px auto 15px auto;">Google Workspace™, Google Sheets™, Google Cloud™, and Gmail™ are registered trademarks of Google LLC. Bill Processor operates as an independent automation utility and maintains no structural or proprietary affiliation with Google LLC.</p>
         <div class="legal-links">
-            <a href="mailto:assist@gcpautomation.store">Support</a>
+            <a href="#about">About</a> • 
+            <a href="#privacy">Privacy Policy</a> • 
+            <a href="#terms">Terms of Service</a>
         </div>
     </footer>
 
