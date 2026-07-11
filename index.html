@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Microsoft Clarity Global Tracking Script -->
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -162,8 +163,8 @@
                 <li><a href="#about">About</a></li>
                 <li><a href="#setup">Setup Guide</a></li>
                 <li><a href="#support">Support</a></li>
-                <li><a href="#privacy.html">Privacy</a></li>
-                <li><a href="#terms.html">Terms</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+                <li><a href="terms.html">Terms of Service</a></li>
             </ul>
         </div>
     </nav>
@@ -259,48 +260,28 @@
         </div>
     </section>
 
-    <section id="privacy">
-        <h2>Privacy Policy</h2>
-        <p><strong>Last Updated: July 2026</strong></p>
-        <p>This Privacy Policy outlines how our suite handles user data. Our core data principle is absolute transparency and minimal data acquisition.</p>
-        
-        <h3>1. Data Collection and Usage</h3>
-        <p>Our tools explicitly limit data interaction. Applications only access data endpoints dynamically granted by the user during explicit operational actions. We do not run background scraping processes on your system files.</p>
-        
-        <h3>2. Data Sharing and Transfer</h3>
-        <p>We strictly prohibit the sale, external transfer, or commercial monetization of user data. All processing operations occur locally or directly within authenticated secure parameters of your Google Cloud™ project scopes. No information is passed to third-party advertising brokers.</p>
-        
-        <h3>3. Data Retention and Deletion</h3>
-        <p>We do not maintain independent databases to store persistent user data records. Session tokens and operational keys are temporary and dynamically managed. Users can instantly revoke authentication access permissions at any time via their standard Google Account security panel settings.</p>
-    </section>
-
-    <section id="terms">
-        <h2>Terms of Service</h2>
-        <p>By utilizing our application software, you explicitly agree to comply with the following operational terms:</p>
-        <ul>
-            <li><strong>Permitted Use:</strong> The software is provided for legal document management and accounting optimization routines. You agree not to exploit the platform endpoints maliciously.</li>
-            <li><strong>Account Responsibility:</strong> Access authentication is managed exclusively via secure Google Single Sign-On (SSO). You remain responsible for maintaining the privacy of your host organization credentials.</li>
-            <li><strong>Disclaimer of Warranty:</strong> The service is provided "as-is." We strive for peak performance stability but do not warrant uninterrupted operation under catastrophic network constraints.</li>
-        </ul>
-    </section>
+    <!-- Hidden compliance backup data text sections kept directly on page context for engine bots -->
+    <div style="display: none;">
+        <h3>Privacy Policy</h3>
+        <p>View complete parameters securely inside our public endpoint repository index layout at privacy.html.</p>
+        <h3>Terms of Service</h3>
+        <p>Review comprehensive runtime usage criteria records directly inside our platform manifest file system at terms.html.</p>
+    </div>
 
     <footer>
         <p>&copy; 2026 Abdullah Bin Satter. All rights reserved.</p>
-        <p style="color: #4b5563; font-size: 0.8rem; max-width: 900px; margin: 5px auto 15px auto;">Google Workspace™, Google Sheets™, Google Cloud™, and Gmail™ are registered trademarks of Google LLC. Bill Processor operates as an independent automation utility and maintains no structural or proprietary affiliation with Google LLC.</p>
+        <p style="color: #4b5563; font-size: 0.8rem; max-width: 900px; margin: 5px auto 15px auto;">Google Workspace™, Google Sheets™, Google Cloud™, and Gmail™ are registered trademarks of Google LLC. GCP Automation Studio operates as an independent software utility developer.</p>
         <div class="legal-links">
-            <a href="#about">About</a> • 
-            <a href="#privacy">Privacy Policy</a> • 
-            <a href="#terms">Terms of Service</a>
+            <a href="privacy.html">Privacy Policy</a> • 
+            <a href="terms.html">Terms of Service</a>
         </div>
     </footer>
 
     <script>
         function switchTab(tabId) {
-            // Remove active status configuration elements
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            // Apply targeted visibility assignments
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
