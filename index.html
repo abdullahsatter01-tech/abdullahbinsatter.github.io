@@ -50,7 +50,7 @@
         header p { font-size: 1.1rem; color: var(--text-muted); }
 
         /* Unified Studio Tabs Controls */
-        .tabs-container { max-width: 1200px; margin: 0 auto 30px auto; display: flex; justify-content: center; gap: 15px; padding: 0 20px; }
+        .tabs-container { max-width: 1200px; margin: 0 auto 30px auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 0 20px; }
         .tab-btn { 
             background-color: #1f2937; 
             border: 1px solid #374151; 
@@ -179,8 +179,11 @@
     <div class="tabs-container">
         <button class="tab-btn active" onclick="switchTab('reconciler-demo')">📊 Bank Reconciler Engine</button>
         <button class="tab-btn" onclick="switchTab('bill-demo')">📁 Bill Processor Module</button>
+        <!-- NEW TAB BUTTON -->
+        <button class="tab-btn" onclick="switchTab('new-app-demo')">⚡ New Web App</button>
     </div>
 
+    <!-- TAB 1: BANK RECONCILER ENGINE -->
     <main id="reconciler-demo" class="tab-content active">
         <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="download-bar">
@@ -215,6 +218,7 @@
         </div>
     </main>
 
+    <!-- TAB 2: BILL PROCESSOR MODULE -->
     <main id="bill-demo" class="tab-content">
         <div style="max-width: 800px; margin: 0 auto 30px auto; text-align: center;">
             <p style="font-size: 1.1rem; margin-bottom: 20px;">Automatically extract processing variables from invoice attachments in Gmail and port metadata structures directly to Google Sheets logs.</p>
@@ -230,8 +234,32 @@
                 <span class="frame-title">bill_processor_overview.mp4</span>
             </div>
             <div class="video-container">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/GVjM6zkvDhQ?si=1wBnStUWyU9hnZ4a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
+        </div>
+    </main>
+
+    <!-- TAB 3: NEW APPS SCRIPT WEB APP -->
+    <main id="new-app-demo" class="tab-content">
+        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="web-app-frame-wrapper">
+                <div class="frame-header">
+                    <div class="frame-dots">
+                        <span class="dot dot-r"></span>
+                        <span class="dot dot-y"></span>
+                        <span class="dot dot-g"></span>
+                    </div>
+                    <span class="frame-title">custom_app_v1.0.exe</span>
+                </div>
+                <iframe 
+                    src="https://script.google.com/macros/s/AKfycbygi4yQqRbTv2f0laBujLLWGtopiLbLGs4JR5m5tg4soTvGVc6NNRyZAij9SxnN0-ox2g/exec" 
+                    width="100%" 
+                    height="750px" 
+                    style="border: none; display: block; background-color: #FFFFFF;"
+                    allow="controlled-frame-origin sandbox">
+                </iframe>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
         </div>
     </main>
 
