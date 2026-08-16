@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Free PDF to Excel Converter | No Sign-up, Secure</title>
+  <!-- 1. Include PDF.js and SheetJS (XLSX) from CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center; }
+    .upload-box { border: 2px dashed #ccc; padding: 40px; cursor: pointer; background: #fafafa; }
+    button { background: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; margin-top: 20px; font-size: 16px; }
+    #status { margin-top: 15px; color: #555; }
+  </style>
+</head>
+<body>
+
+  <h2>Free PDF to Excel Converter</h2>
+  <p>Convert your tables from PDF to editable Excel spreadsheets instantly. 100% secure - files never leave your device.</p>
+
+  <div class="upload-box" onclick="document.getElementById('file-input').click()">
+    <p>Click to upload or drag & drop a PDF file</p>
+    <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
+  </div>
+
+  <p id="status"></p>
+  <button id="btn-convert" style="display:none;" onclick="convertToExcel()">Convert to Excel</button>
+
+  <script>
+    // Set PDF.js Worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    let uploadedFile = null;
+
+    function handleFile(file) {
+      if (!file) return;
+      uploadedFile = file;
+      document.getElementById('status').innerText = `Selected File: ${file.name}`;
+      document.getElementById('btn-convert').style.display = 'inline-block';
+    }
+
+    async function convertToExcel() {
+      if (!uploadedFile) return;
+      document.getElementById('status').innerText = "Processing PDF...";
+
+      const reader = new FileReader();
+      reader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        
+        try {
+          // Load the PDF using PDF.js
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+          const excelData = [];
+
+          // Loop through every page in the PDF
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+            
+            // Organize text items by their vertical position (Y-coordinate)
+            const lines = {};
+            textContent.items.forEach(item => {
+              const y = Math.round(item.transform[5]); // Vertical Y coordinate
+              if (!lines[y]) lines[y] = [];
+              lines[y].push(item);
+            });
+
+            // Sort lines from top to bottom (descending Y coordinates)
+            const sortedY = Object.keys(lines).sort((a, b) => b - a);
+
+            sortedY.forEach(y => {
+              // Sort text items in the line from left to right (horizontal X coordinate)
+              const rowItems = lines[y].sort((a, b) => a.transform[4] - b.transform[4]);
+              
+              // Map items to a clean array of row cells
+              const rowData = rowItems.map(item => item.str.trim()).filter(str => str !== "");
+              if (rowData.length > 0) {
+                excelData.push(rowData);
+              }
+            });
+          }
+
+          if (excelData.length === 0) {
+            document.getElementById('status').innerText = "Could not extract any data. Is this a scanned image PDF?";
+            return;
+          }
+
+          // Create the Excel Workbook using SheetJS
+          const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+          // Download the file
+          XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}.xlsx`);
+          document.getElementById('status').innerText = "Conversion Successful! Download started.";
+
+        } catch (error) {
+          console.error(error);
+          document.getElementById('status').innerText = "Error parsing PDF. Make sure it's not password protected.";
+        }
+      };
+
+      reader.readAsArrayBuffer(uploadedFile);
+    }
+  </script>
+</body>
+</html>
