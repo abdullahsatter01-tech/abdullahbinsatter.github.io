@@ -14,9 +14,40 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GCP Automation Studio - Workspace Tools</title>
-    
-    <!-- PDF.js and SheetJS Libraries Integrated Safely via CDN -->
+    <title>Free PDF to Excel Converter Online | No Sign-Up & Secure</title>
+    <meta name="description" content="Convert PDF bank statements and financial tables to editable Excel (.xlsx) spreadsheets. 100% secure client-side browser execution—no data ever leaves your device.">
+
+    <!-- Structured FAQ Schema Markup for Google SEO Dropdowns -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "Is my financial data safe using this PDF to Excel converter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. This converter runs 100% client-side inside your local web browser. Your sensitive files and bank statements are processed locally on your device and are never uploaded to any server or shared with anyone."
+        }
+      }, {
+        "@type": "Question",
+        "name": "Can I edit the converted spreadsheet before downloading?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our interactive spreadsheet canvas lets you click any cell, edit text, adjust numbers, and delete redundant lines directly on the screen before exporting your finished .xlsx file."
+        }
+      }, {
+        "@type": "Question",
+        "name": "How does the 'Copy Table' feature work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Clicking 'Copy Table' formats your parsed statement into standard tab-separated values (TSV) and copies it to your clipboard. When you paste it into Microsoft Excel or Google Sheets, the columns and rows align automatically."
+        }
+      }]
+    }
+    </script>
+
+    <!-- PDF.js and SheetJS Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -58,64 +89,8 @@
         header h1 { font-size: 2.8rem; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px; }
         header p { font-size: 1.1rem; color: var(--text-muted); }
 
-        /* Unified Studio Tabs Controls */
-        .tabs-container { max-width: 1200px; margin: 0 auto 30px auto; display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; padding: 0 20px; }
-        .tab-btn { 
-            background-color: #1f2937; 
-            border: 1px solid #374151; 
-            color: var(--text-muted); 
-            padding: 14px 28px; 
-            font-size: 1rem; 
-            font-weight: 600; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .tab-btn:hover { color: #fff; border-color: var(--primary); }
-        .tab-btn.active { 
-            background-color: var(--card-bg); 
-            color: #fff; 
-            border-color: var(--primary); 
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); 
-        }
-
-        /* Demo Viewport Panes */
-        .tab-content { display: none; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
-
-        /* Asset Download Node */
-        .download-bar { 
-            background: linear-gradient(135deg, rgba(31, 41, 55, 0.4), rgba(17, 24, 39, 0.4)); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 12px; 
-            padding: 16px 20px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        .download-info h3 { font-size: 1.05rem; color: #F3F4F6; margin-bottom: 2px; }
-        .download-info p { font-size: 0.88rem; color: var(--text-muted); }
-        .download-buttons { display: flex; gap: 10px; }
-        .btn-download { 
-            text-decoration: none; 
-            padding: 8px 14px; 
-            background-color: #1f2937; 
-            border: 1px solid #374151; 
-            color: #e5e7eb; 
-            border-radius: 6px; 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            transition: all 0.2s; 
-        }
-        .btn-download:hover { border-color: var(--primary); color: #fff; }
-
-        /* Window Frame Structure */
+        /* Workspace Wrapper */
+        .workspace-container { max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
         .web-app-frame-wrapper { 
             border-radius: 16px; 
             overflow: hidden; 
@@ -131,35 +106,11 @@
         .dot-g { background-color: #10b981; }
         .frame-title { font-size: 0.85rem; color: var(--text-muted); font-family: monospace; letter-spacing: 0.5px; }
 
-        /* Video Showcase Layout Frame */
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: #000; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        /* Unified Content Sections Styling */
-        section { max-width: 1200px; margin: 80px auto; padding: 0 20px; scroll-margin-top: 100px; }
-        h2 { font-size: 2rem; color: var(--text-main); margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        h2::after { content: ''; display: inline-block; flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--primary), transparent); margin-left: 15px; }
-        h3 { font-size: 1.25rem; color: var(--primary); margin: 25px 0 10px; font-weight: 600; }
-        p { margin-bottom: 15px; font-size: 1.02rem; color: var(--text-muted); }
-        ul, ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
-        li { margin-bottom: 10px; font-size: 1.02rem; }
-
-        /* Setup Cards / Information Panels */
-        .setup-step { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; border-radius: 8px; list-style-type: none; border-left: 4px solid var(--primary); }
-        .setup-step strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 4px; }
-        .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* =========================================================================
-           NATIVE SPLIT-SCREEN PDF TO EXCEL CONVERTER STYLES
-           ========================================================================= */
-        .converter-workspace {
-            display: flex;
-            height: 800px; /* Workspace height */
-            background-color: var(--dark-bg);
-        }
+        /* Split-Screen Workspace */
+        .converter-workspace { display: flex; height: 800px; background-color: var(--dark-bg); }
         .converter-left {
-            width: 256px; /* 20% Smaller Sidebar */
-            flex-shrink: 0; /* Prevents browser from squeezing panel */
+            width: 256px;
+            flex-shrink: 0;
             background-color: var(--card-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
             padding: 20px 15px;
@@ -170,7 +121,7 @@
         }
         .converter-right {
             flex-grow: 1;
-            min-width: 0; /* Allows container to stay responsive */
+            min-width: 0;
             background-color: #0d121f; 
             padding: 20px;
             display: flex;
@@ -201,27 +152,12 @@
             transition: all 0.2s;
             margin-top: 15px;
         }
-        .conv-btn-convert {
-            background-color: var(--primary);
-            color: #0b0f19;
-        }
-        .conv-btn-convert:hover {
-            background-color: var(--primary-dark);
-            box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
-        }
-        .conv-btn-download {
-            background-color: var(--success);
-            color: white;
-            margin-top: auto;
-        }
-        .conv-btn-download:hover {
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-        }
-        .conv-tools-section {
-            margin-top: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 20px;
-        }
+        .conv-btn-convert { background-color: var(--primary); color: #0b0f19; }
+        .conv-btn-convert:hover { background-color: var(--primary-dark); box-shadow: 0 0 12px rgba(0, 229, 255, 0.3); }
+        .conv-btn-download { background-color: var(--success); color: white; margin-top: auto; }
+        .conv-btn-download:hover { box-shadow: 0 0 12px rgba(16, 185, 129, 0.3); }
+        
+        .conv-tools-section { margin-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 20px; }
         .conv-tool-btn {
             display: block;
             width: 100%;
@@ -237,127 +173,59 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-        .conv-tool-btn:hover {
-            border-color: var(--primary);
-            color: white;
-        }
+        .conv-tool-btn:hover { border-color: var(--primary); color: white; }
 
-        /* Spreadsheet Layout & Focus Highlighter */
-        .preview-header-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .preview-container {
-            flex-grow: 1;
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            overflow: auto;
-        }
-        .preview-container table {
-            border-collapse: collapse;
-            width: 100%;
-            font-size: 0.85rem; /* Larger, readable text */
-            color: var(--text-main);
-            table-layout: fixed; /* Dynamic column math constraints */
-        }
-        .preview-container th {
-            background-color: #1f2937;
-            color: var(--primary);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-weight: 700;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .preview-container th, .preview-container td {
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 10px 12px;
-            outline: none;
-            word-break: break-word; /* Allows text inside cells to wrap cleanly */
-        }
-        .preview-container td:focus {
-            background-color: rgba(0, 229, 255, 0.05);
-            border: 1px solid var(--primary);
-            box-shadow: inset 0 0 0 1px var(--primary);
-        }
-        .preview-container tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.01);
-        }
+        /* Spreadsheet Canvas styling */
+        .preview-header-title { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .preview-container { flex-grow: 1; background-color: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; overflow: auto; }
+        .preview-container table { border-collapse: collapse; width: 100%; font-size: 0.85rem; color: var(--text-main); table-layout: fixed; }
+        .preview-container th { background-color: #1f2937; color: var(--primary); position: sticky; top: 0; z-index: 10; font-weight: 700; border-bottom: 2px solid rgba(255, 255, 255, 0.08); text-transform: uppercase; letter-spacing: 0.5px; }
+        .preview-container th, .preview-container td { border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 12px; outline: none; word-break: break-word; }
+        .preview-container td:focus { background-color: rgba(0, 229, 255, 0.05); border: 1px solid var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+        .preview-container tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
 
-        /* Professional Column Sizing Rules */
+        /* Accounting Column Sizing */
         .col-date { width: 100px; min-width: 100px; text-align: center !important; }
-        .col-desc { text-align: left !important; } /* Let description consume all remaining space */
+        .col-desc { text-align: left !important; }
         .col-ref { width: 90px; min-width: 90px; text-align: center !important; }
         .col-amount { width: 110px; min-width: 110px; text-align: right !important; }
         .col-action { width: 80px; min-width: 80px; text-align: center !important; }
 
-        /* Action Deletions Column */
-        .btn-row-delete {
-            background: none;
-            border: none;
-            color: var(--danger);
-            font-size: 1.1rem;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 4px;
-            padding: 1px 8px;
-            transition: all 0.2s;
-            display: block;
-            margin: 0 auto;
-        }
-        .btn-row-delete:hover {
-            background-color: rgba(239, 68, 68, 0.15);
-        }
+        .btn-row-delete { background: none; border: none; color: var(--danger); font-size: 1.1rem; cursor: pointer; font-weight: bold; padding: 1px 8px; transition: all 0.2s; display: block; margin: 0 auto; }
+        .btn-row-delete:hover { background-color: rgba(239, 68, 68, 0.15); }
 
-        /* Legacy fallback for manual buttons */
-        .sort-btn {
-            padding: 4px 10px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            border: 1px solid #374151;
-            border-radius: 4px;
-            background: #1f2937;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .sort-btn:hover {
-            background: var(--primary);
-            color: #0b0f19;
-            border-color: var(--primary);
-        }
+        .sort-btn { padding: 4px 10px; font-size: 0.72rem; font-weight: 600; border: 1px solid #374151; border-radius: 4px; background: #1f2937; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+        .sort-btn:hover { background: var(--primary); color: #0b0f19; border-color: var(--primary); }
 
-        /* Responsive stack for Mobile viewports */
+        /* Unified Content Sections */
+        section { max-width: 1200px; margin: 80px auto; padding: 0 20px; scroll-margin-top: 100px; }
+        h2 { font-size: 2rem; color: var(--text-main); margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        h2::after { content: ''; display: inline-block; flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--primary), transparent); margin-left: 15px; }
+        h3 { font-size: 1.25rem; color: var(--primary); margin: 25px 0 10px; font-weight: 600; }
+        p { margin-bottom: 15px; font-size: 1.02rem; color: var(--text-muted); }
+        ul, ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
+        li { margin-bottom: 10px; font-size: 1.02rem; }
+
+        .setup-step { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; border-radius: 8px; list-style-type: none; border-left: 4px solid var(--primary); }
+        .setup-step strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 4px; }
+        .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* Toast notifications */
+        .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+        .toast { padding: 11px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); font-size: 0.83rem; font-weight: 600; color: #fff; max-width: 320px; animation: slideIn 0.25s ease; }
+        .toast-green { background: var(--success); }
+        .toast-red { background: var(--danger); }
+
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive stack for Mobile */
         @media (max-width: 768px) {
-            .converter-workspace {
-                flex-direction: column;
-                height: auto;
-            }
-            .converter-left {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            }
-            .converter-right {
-                height: 500px;
-            }
+            .converter-workspace { flex-direction: column; height: auto; }
+            .converter-left { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+            .converter-right { height: 500px; }
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Footer System */
         footer { margin-top: 120px; padding: 60px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background-color: var(--card-bg); font-size: 0.88rem; }
         footer p { color: var(--text-muted); margin-bottom: 8px; }
         .legal-links { margin-top: 15px; }
@@ -367,13 +235,15 @@
 </head>
 <body>
 
+    <div class="toast-wrap" id="toastWrap"></div>
+
     <nav>
         <div class="nav-container">
-            <a href="#" class="logo">GCP Automation <span>Studio</span></a>
+            <a href="index.html" class="logo">GCP Automation <span>Studio</span></a>
             <ul class="nav-links">
+                <li><a href="index.html">Workspace Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#setup">Setup Guide</a></li>
-                <li><a href="#support">Support</a></li>
                 <li><a href="privacy.html">Privacy Policy</a></li>
                 <li><a href="terms.html">Terms of Service</a></li>
             </ul>
@@ -382,195 +252,96 @@
 
     <header>
         <div class="hero-container">
-            <h1>Automation Workspace</h1>
-            <p>Lightweight ecosystem tools designed securely inside Google Workspace extensions.</p>
-            <p>We only have 1 rule, none of your data is saved anywhere in any system.</p>
+            <h1>PDF to Excel Converter</h1>
+            <p>Interactive, local coordinates parsing designed specifically for financial statement structures.</p>
         </div>
     </header>
 
-    <div class="tabs-container">
-        <button class="tab-btn active" onclick="switchTab('reconciler-demo')">📊 Free Bank Reconciler</button>
-        <button class="tab-btn" onclick="switchTab('pdf-to-excel-demo')">📈 Free PDF to Excel</button>
-        <button class="tab-btn" onclick="switchTab('bill-demo')">📁 Free Gmail addon for Bill processing</button>
-        <button class="tab-btn" onclick="switchTab('new-app-demo')">⚡ Free PDF Merger</button>
-    </div>
-
-    <!-- TAB 1: Free Bank Reconciler -->
-    <main id="reconciler-demo" class="tab-content active">
-        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <div class="download-bar">
-                <div class="download-info">
-                    <h3>📺 YouTube Tutorial Sandbox</h3>
-                    <p>Grab the verification CSV sets to run the calculation layout variables live.</p>
-                </div>
-                <div class="download-buttons">
-                    <a href="bank.csv" download class="btn-download">Download Bank.csv</a>
-                    <a href="GL.csv" download class="btn-download">Download GL.csv</a>
-                </div>
-            </div>
-
-            <div class="web-app-frame-wrapper">
-                <div class="frame-header">
-                    <div class="frame-dots">
-                        <span class="dot dot-r"></span>
-                        <span class="dot dot-y"></span>
-                        <span class="dot dot-g"></span>
-                    </div>
-                    <span class="frame-title">reconciler_engine_v1.0.exe</span>
-                </div>
-                <iframe 
-                    src="https://script.google.com/macros/s/AKfycby_jZQyw6EBdtNh1Cki0S9NsKRxomot0DoxxMfPgs67ehlbyTcbPpfGGFZqLxCIYv1g9Q/exec" 
-                    width="100%" 
-                    height="750px" 
-                    style="border: none; display: block; background-color: #FFFFFF;"
-                    allow="controlled-frame-origin sandbox">
-                </iframe>
-            </div>
-            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
-        </div>
-    </main>
-
-    <!-- NEW TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
-    <main id="pdf-to-excel-demo" class="tab-content">
-        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <div class="web-app-frame-wrapper">
-                <div class="frame-header">
-                    <div class="frame-dots">
-                        <span class="dot dot-r"></span>
-                        <span class="dot dot-y"></span>
-                        <span class="dot dot-g"></span>
-                    </div>
-                    <span class="frame-title">pdf_to_excel_studio_v1.0.html</span>
-                </div>
-                
-                <div class="converter-workspace">
-                    <!-- Left Control Board -->
-                    <div class="converter-left">
-                        <div>
-                            <p style="margin-bottom: 15px; color: #fff; font-weight: 600;">Browser Sandbox parsing</p>
-                            
-                            <div class="converter-upload-box" onclick="document.getElementById('file-input').click()">
-                                <p style="margin: 0; font-weight: 600; color: var(--primary); font-size: 0.85rem;">Click to upload PDF</p>
-                                <p style="margin: 5px 0 0 0; font-size: 0.72rem; color: var(--text-muted);">Secure local browser conversion</p>
-                                <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
-                            </div>
-                            
-                            <p id="status" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-top: 15px;"></p>
-                            <button id="btn-convert" class="conv-btn conv-btn-convert" style="display:none;" onclick="convertToExcel()">Convert & Preview</button>
-
-                            <!-- Modification Clean Tools -->
-                            <div class="conv-tools-section" id="clean-tools" style="display: none;">
-                                <h3 style="font-size: 0.8rem; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Workspace Rules</h3>
-                                <button class="conv-tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Filter Noise Rows</button>
-                                <button class="conv-tool-btn" onclick="cleanDuplicateHeaders()">🧹 Remove Repeating Headers</button>
-                                <button class="conv-tool-btn" onclick="cleanEmptyRows()">🗑️ Delete Empty Rows</button>
-                                <button class="conv-tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Text</button>
-                            </div>
-                        </div>
-                        <button id="btn-push" class="conv-btn conv-btn-convert" style="display:none; background-color: var(--primary); color: #0b0f19; margin-bottom: 10px;" onclick="pushToReconciler()">⚡ Push to Bank Reconciler</button>
-                        <button id="btn-download" class="conv-btn conv-btn-download" style="display:none;" onclick="downloadExcel()">Download Excel Sheet</button>
-                    </div>
-
-                    <!-- Right Spreadsheet Board -->
-                    <div class="converter-right">
-                        <div class="preview-header-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div>
-                                <span>Spreadsheet Canvas</span>
-                                <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
-                            </div>
-                            <!-- Interactive Undo Button (Disabled by default) -->
-                            <button id="btn-undo" class="sort-btn" style="opacity: 0.5; cursor: not-allowed; padding: 4px 10px; margin-right: 10px;" onclick="undoLastAction()" disabled>↩ Undo</button>
-                        </div>
-                        <div class="preview-container">
-                            <table id="preview-table" contenteditable="true">
-                                <!-- Data elements will construct here -->
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
-        </div>
-    </main>
-
-    <!-- TAB 3: Free Gmail addon for Bill processing -->
-    <main id="bill-demo" class="tab-content">
-        <div style="max-width: 800px; margin: 0 auto 30px auto; text-align: center;">
-            <p style="font-size: 1.1rem; margin-bottom: 20px;">Automatically extract processing variables from invoice attachments in Gmail and port metadata structures directly to Google Sheets logs.</p>
-        </div>
-        
-        <div class="web-app-frame-wrapper" style="max-width: 900px; margin: 0 auto;">
+    <div class="workspace-container">
+        <div class="web-app-frame-wrapper">
             <div class="frame-header">
                 <div class="frame-dots">
                     <span class="dot dot-r"></span>
                     <span class="dot dot-y"></span>
                     <span class="dot dot-g"></span>
                 </div>
-                <span class="frame-title">bill_processor_overview.mp4</span>
+                <span class="frame-title">pdf_to_excel_studio_v1.0.html</span>
             </div>
-            <div class="video-container">
-                <iframe width="560" height="315" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-        </div>
-    </main>
+            
+            <div class="converter-workspace">
+                <!-- Left Control Board -->
+                <div class="converter-left">
+                    <div>
+                        <p style="margin-bottom: 15px; color: #fff; font-weight: 600;">Local Browser Sandbox</p>
+                        
+                        <div class="converter-upload-box" onclick="document.getElementById('file-input').click()">
+                            <p style="margin: 0; font-weight: 600; color: var(--primary); font-size: 0.85rem;">Click to upload PDF</p>
+                            <p style="margin: 5px 0 0 0; font-size: 0.72rem; color: var(--text-muted);">Secure local browser conversion</p>
+                            <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
+                        </div>
+                        
+                        <p id="status" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-top: 15px;"></p>
+                        <button id="btn-convert" class="conv-btn conv-btn-convert" style="display:none;" onclick="convertToExcel()">Convert & Preview</button>
 
-    <!-- TAB 4: NEW APPS SCRIPT WEB APP -->
-    <main id="new-app-demo" class="tab-content">
-        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <div class="web-app-frame-wrapper">
-                <div class="frame-header">
-                    <div class="frame-dots">
-                        <span class="dot dot-r"></span>
-                        <span class="dot dot-y"></span>
-                        <span class="dot dot-g"></span>
+                        <!-- Modification Clean Tools -->
+                        <div class="conv-tools-section" id="clean-tools" style="display: none;">
+                            <h3 style="font-size: 0.8rem; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Workspace Rules</h3>
+                            <button class="conv-tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Filter Noise Rows</button>
+                            <button class="conv-tool-btn" onclick="cleanDuplicateHeaders()">🧹 Remove Repeating Headers</button>
+                            <button class="conv-tool-btn" onclick="cleanEmptyRows()">🗑️ Delete Empty Rows</button>
+                            <button class="conv-tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Text</button>
+                        </div>
                     </div>
-                    <span class="frame-title">custom_app_v1.0.exe</span>
+                    <button id="btn-push" class="conv-btn conv-btn-convert" style="display:none; background-color: var(--primary); color: #0b0f19; margin-bottom: 10px;" onclick="pushToReconciler()">⚡ Push to Bank Reconciler</button>
+                    <button id="btn-download" class="conv-btn conv-btn-download" style="display:none;" onclick="downloadExcel()">Download Excel Sheet</button>
                 </div>
-                <iframe 
-                    src="https://script.google.com/macros/s/AKfycbygi4yQqRbTv2f0laBujLLWGtopiLbLGs4JR5m5tg4soTvGVc6NNRyZAij9SxnN0-ox2g/exec" 
-                    width="100%" 
-                    height="750px" 
-                    style="border: none; display: block; background-color: #FFFFFF;"
-                    allow="controlled-frame-origin sandbox">
-                </iframe>
-            </div>
-            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
-        </div>
-    </main>
 
+                <!-- Right Spreadsheet Board -->
+                <div class="converter-right">
+                    <div class="preview-header-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <span>Spreadsheet Canvas</span>
+                            <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <!-- Copy Table Button -->
+                            <button id="btn-copy" class="sort-btn" style="display: none; padding: 4px 10px;" onclick="copyTableToClipboard()">📋 Copy Table</button>
+                            <!-- Interactive Undo Button (Disabled by default) -->
+                            <button id="btn-undo" class="sort-btn" style="opacity: 0.5; cursor: not-allowed; padding: 4px 10px;" onclick="undoLastAction()" disabled>↩ Undo</button>
+                        </div>
+                    </div>
+                    <div class="preview-container">
+                        <table id="preview-table" contenteditable="true">
+                            <!-- Data elements will construct here -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
+    </div>
+
+    <!-- E-E-A-T trust & Educational Guide Section -->
     <section id="about">
-        <h2>About the Studio</h2>
-        <p>GCP Automation Studio optimizes your financial workflows. Integrated directly into your Google Workspace™ environment, our tools empower users to seamlessly organize, analyze, and process statement documents, receipts, and invoices without leaving their cloud environment.</p>
+        <h2>Local Processing Security Audit</h2>
+        <div class="card" style="border-left: 4px solid var(--success); background: rgba(16, 185, 129, 0.02);">
+            <p style="color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;">🔒 Privacy Statement: No data is uploaded or transmitted</p>
+            <p>Standard PDF converters require uploading sensitive company files or client bank statements to foreign cloud servers. This exposes confidential transactional balances to external data miners and potential leaks.</p>
+            <p>Our **GCP Automation Studio Converter operates 100% locally** within your web browser sandbox. Once this page finishes loading, your device handles the entire extraction process. No database, server, or API ever sees your financial statements.</p>
+        </div>
     </section>
 
     <section id="setup">
-        <h2>Application Setup Guide</h2>
-        <p style="margin-bottom: 25px;">Follow these instructions to configure our extensions after installation:</p>
+        <h2>Expert Financial Statement Guide</h2>
+        <p>Converting bank statement PDFs into structured Excel sheets requires maintaining ledger integrity. Here is how to configure and clean your extracted data efficiently:</p>
         <ol>
-            <li class="setup-step"><strong>1. Install the App</strong> Click the "Install" button on the Google Workspace Marketplace™ listing page.</li>
-            <li class="setup-step"><strong>2. Grant Permissions</strong> Review and accept the OAuth authorization prompts to securely connect your workspace pipelines.</li>
-            <li class="setup-step"><strong>3. Initialize Integration</strong> Open your Google Workspace™ container (such as Google Sheets™ or the sidebar layout), find the processor icon, and start scanning your financial layouts instantly.</li>
+            <li class="setup-step"><strong>1. Standardize Coordinates</strong> Once you click "Convert & Preview", our engine dynamically tracks column coordinates based on the table headers (`DATE`, `DESCRIPTION`, etc.) to prevent structural column shifting.</li>
+            <li class="setup-step"><strong>2. Clean Duplicate Headers</strong> Multi-page statements repeat the table headers on every new page. Click the <strong>🧹 Remove Repeating Headers</strong> rule in the workspace panel to delete these duplicate lines instantly.</li>
+            <li class="setup-step"><strong>3. Filter Extraneous Metadata</strong> Document headers, opening messages, and terms of service don't belong in your final ledger. Click the **⚡ Auto-Filter Noise Rows** button to automatically wipe out non-transaction lines based on date-patterns.</li>
+            <li class="setup-step"><strong>4. Double-Check the Balance Matrix</strong> Our built-in calculation engine mathematically verifies each transaction row. If you correct any typos in the withdrawal or deposit cells, the balances recalculate in real-time.</li>
         </ol>
     </section>
-
-    <section id="support">
-        <h2>Support & Contact</h2>
-        <p>We are dedicated to providing a smooth user experience. If you encounter bugs, deployment errors, or want to request custom feature additions, our support infrastructure is ready to help.</p>
-        <div class="card">
-            <p style="color: #fff; font-weight: 600; margin-bottom: 5px;">Customer Support Gateway:</p>
-            <p style="color: var(--primary); font-family: monospace; font-size: 1.1rem; margin-bottom: 10px;">assist@gcpautomation.store</p>
-            <p style="margin: 0; font-size: 0.95rem;">Response Time Promise: We generally respond to administrative and technical queries within 24-48 business hours.</p>
-        </div>
-    </section>
-
-    <!-- Hidden compliance backup data text sections kept directly on page context for engine bots -->
-    <div style="display: none;">
-        <h3>Privacy Policy</h3>
-        <p>View complete parameters securely inside our public endpoint repository index layout at privacy.html.</p>
-        <h3>Terms of Service</h3>
-        <p>Review comprehensive runtime usage criteria records directly inside our platform manifest file system at terms.html.</p>
-    </div>
 
     <footer>
         <p>&copy; 2026 GCP Automation Store. All rights reserved.</p>
@@ -713,7 +484,6 @@
                     detectedHeaders.forEach((headerText, colIdx) => {
                         const th = document.createElement('th');
                         th.innerText = headerText;
-                        // Assign structural classes
                         if (colIdx === 0) th.className = "col-date";
                         else if (colIdx === 1) th.className = "col-desc";
                         else if (colIdx === 2) th.className = "col-ref";
@@ -732,7 +502,6 @@
                         row.forEach((cellText, colIdx) => {
                             const td = document.createElement('td');
                             td.innerText = cellText;
-                            // Assign structural classes
                             if (colIdx === 0) td.className = "col-date";
                             else if (colIdx === 1) td.className = "col-desc";
                             else if (colIdx === 2) td.className = "col-ref";
@@ -757,6 +526,7 @@
                     document.getElementById('clean-tools').style.display = 'block';
                     document.getElementById('btn-download').style.display = 'block';
                     document.getElementById('btn-push').style.display = 'block';
+                    document.getElementById('btn-copy').style.display = 'inline-block'; // Display copy button
 
                 } catch (error) {
                     console.error(error);
@@ -1036,6 +806,52 @@
         }
 
         /* =========================================================================
+           COPY TABLE TO CLIPBOARD
+           ========================================================================= */
+        function copyTableToClipboard() {
+            const table = document.getElementById('preview-table');
+            if (!table || table.rows.length === 0) return;
+
+            // 1. Temporarily hide no-export columns
+            const noExportElements = document.querySelectorAll('.no-export');
+            noExportElements.forEach(el => el.style.display = 'none');
+
+            // 2. Extract text and format as TSV (Tab-Separated Values)
+            let tsvString = "";
+            Array.from(table.rows).forEach(row => {
+                const rowCells = Array.from(row.cells).map(cell => {
+                    let text = cell.innerText.trim();
+                    if (text.includes('"') || text.includes('\n') || text.includes('\t')) {
+                        text = '"' + text.replace(/"/g, '""') + '"';
+                    }
+                    return text;
+                });
+                tsvString += rowCells.join('\t') + '\r\n';
+            });
+
+            // 3. Restore delete column visibility
+            noExportElements.forEach(el => el.style.display = '');
+
+            // 4. Use the Clipboard API to copy it
+            navigator.clipboard.writeText(tsvString).then(() => {
+                toast("Table copied to clipboard! Paste it directly into Excel or Google Sheets.", "green");
+            }).catch(err => {
+                console.error("Failed to copy table: ", err);
+                toast("Failed to copy table.", "red");
+            });
+        }
+
+        // Notification helper
+        function toast(msg, type) {
+            const wrap = document.getElementById('toastWrap');
+            const div = document.createElement('div');
+            div.className = `toast toast-${type}`;
+            div.innerText = msg;
+            wrap.appendChild(div);
+            setTimeout(() => { div.remove(); }, 4000);
+        }
+
+        /* =========================================================================
            TAB CONTROLLER SCRIPT
            ========================================================================= */
         function switchTab(tabId) {
@@ -1048,4 +864,4 @@
     </script>
 
 </body>
-</html>
+</html>--- 
