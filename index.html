@@ -317,14 +317,18 @@
         .sort-btn { padding: 4px 10px; font-size: 0.72rem; font-weight: 600; border: 1px solid #374151; border-radius: 4px; background: #1f2937; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
         .sort-btn:hover { background: var(--primary); color: #0b0f19; border-color: var(--primary); }
 
-        /* Toast notifications */
-        .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
-        .toast { padding: 11px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); font-size: 0.83rem; font-weight: 600; color: #fff; max-width: 320px; animation: slideIn 0.25s ease; }
-        .toast-green { background: var(--success); }
-        .toast-red { background: var(--danger); }
+        /* Responsive stack for Mobile */
+        @media (max-width: 768px) {
+            .converter-workspace { flex-direction: column; height: auto; }
+            .converter-left { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+            .converter-right { height: 500px; }
+        }
 
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -704,7 +708,6 @@
                         row.forEach((cellText, colIdx) => {
                             const td = document.createElement('td');
                             td.innerText = cellText;
-                            // Assign structural classes
                             if (colIdx === 0) td.className = "col-date";
                             else if (colIdx === 1) td.className = "col-desc";
                             else if (colIdx === 2) td.className = "col-ref";
@@ -912,26 +915,6 @@
             alert(`Deleted ${removedCount} empty rows.`);
         }
 
-        function promptDeleteRowByText() {
-            saveState();
-            const filterText = prompt("Enter specific text to delete matching rows:");
-            if (!filterText) return;
-
-            const lowerFilter = filterText.toLowerCase().trim();
-            const rows = document.querySelectorAll('#preview-table tr');
-            let removedCount = 0;
-
-            rows.forEach((row, index) => {
-                if (index === 0) return;
-                if (row.innerText.toLowerCase().includes(lowerFilter)) {
-                    row.remove();
-                    removedCount++;
-                }
-            });
-            recalculateBalances();
-            alert(`Deleted ${removedCount} rows matching "${filterText}".`);
-        }
-
         // =====================================================================
         // NEW WORKSPACE REGISTRATION & TUNNEL (THE MISSING LINK)
         // =====================================================================
@@ -1055,6 +1038,44 @@
         }
 
         /* =========================================================================
+           THEME SWITCHER LOGIC WITH LOCALSTORAGE PERSISTENCE
+           ========================================================================= */
+        function toggleTheme() {
+            const body = document.body;
+            body.classList.toggle('light-mode');
+            
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            updateThemeUI(isLight);
+        }
+
+        function updateThemeUI(isLight) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            const btn = document.getElementById('theme-toggle');
+            
+            if (isLight) {
+                icon.innerText = "🌙";
+                text.innerText = "Dark Mode";
+                btn.style.borderColor = "var(--primary)";
+            } else {
+                icon.innerText = "☀️";
+                text.innerText = "Light Mode";
+                btn.style.borderColor = "rgba(255, 255, 255, 0.15)";
+            }
+        }
+
+        // Initialize Theme on Page Load based on user's saved preference
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                updateThemeUI(true);
+            }
+        })();
+
+        /* =========================================================================
            TAB CONTROLLER SCRIPT
            ========================================================================= */
         function switchTab(tabId) {
@@ -1068,6 +1089,3 @@
 
 </body>
 </html>
---- END OF FILE Paste August 17, 2026 - 11:47PM ---
-
-look into both the files and suggest exactly what changes are required so we can run this successfully. (this is the final step, please review slowly and give me exact steps, no shortcuts please)
