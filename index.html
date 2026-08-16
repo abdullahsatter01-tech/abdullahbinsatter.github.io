@@ -158,21 +158,19 @@
             background-color: var(--dark-bg);
         }
         .converter-left {
-    width: 260px;
-    flex-shrink: 0;
-    flex-grow: 0; /* Ensures the panel never expands horizontally */
-    background-color: var(--card-bg);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 25px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Changed from space-between to group elements at the top */
-    gap: 16px; /* Creates a clean, tight spacing of 16px between every element */
-    overflow-y: auto;
-}
+            width: 320px;
+            flex-shrink: 0; /* Prevents the browser from squeezing this panel when tables are wide */
+            background-color: var(--card-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
         .converter-right {
             flex-grow: 1;
-            min-width: 0; /* 2. Tell the browser to scroll the table horizontally instead of stretching the panel */
+            min-width: 0; /* Forces horizontal scroll on wide spreadsheet elements instead of shrinking layout */
             background-color: #0d121f; /* Sleek contrasting dark slate */
             padding: 20px;
             display: flex;
@@ -317,6 +315,24 @@
             min-width: 70px;
         }
 
+        /* Legacy fallback for manual buttons */
+        .sort-btn {
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            background: #1f2937;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sort-btn:hover {
+            background: var(--primary);
+            color: #0b0f19;
+            border-color: var(--primary);
+        }
+
         /* Responsive stack for Mobile viewports */
         @media (max-width: 768px) {
             .converter-workspace {
@@ -412,7 +428,7 @@
         </div>
     </main>
 
-    <!-- NEW TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
+    <!-- TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
     <main id="pdf-to-excel-demo" class="tab-content">
         <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="web-app-frame-wrapper">
@@ -455,9 +471,13 @@
 
                     <!-- Right Spreadsheet Board -->
                     <div class="converter-right">
-                        <div class="preview-header-title">
-                            <span>Spreadsheet Canvas</span>
-                            <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
+                        <div class="preview-header-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <div>
+                                <span>Spreadsheet Canvas</span>
+                                <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
+                            </div>
+                            <!-- Interactive Undo Button (Disabled by default) -->
+                            <button id="btn-undo" class="sort-btn" style="opacity: 0.5; cursor: not-allowed; padding: 4px 10px; margin-right: 10px;" onclick="undoLastAction()" disabled>↩ Undo</button>
                         </div>
                         <div class="preview-container">
                             <table id="preview-table" contenteditable="true">
@@ -566,6 +586,8 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         let uploadedFile = null;
+        let undoStack = []; // Track manual edits
+        const MAX_UNDO_LIMIT = 20; // Keeps memory consumption lightweight
 
         function handleFile(file) {
             if (!file) return;
@@ -710,7 +732,7 @@
                         const tdAction = document.createElement('td');
                         tdAction.className = "no-export";
                         tdAction.contentEditable = "false"; // Disable cell editing on delete button
-                        tdAction.innerHTML = `<button class="btn-row-delete" onclick="this.closest('tr').remove(); recalculateBalances();">×</button>`;
+                        tdAction.innerHTML = `<button class="btn-row-delete" onclick="saveState(); this.closest('tr').remove(); recalculateBalances();">×</button>`;
                         tr.appendChild(tdAction);
 
                         table.appendChild(tr);
@@ -787,12 +809,64 @@
         // Event Listener: Recalculate balance ledger as soon as any user input is entered
         document.getElementById('preview-table').addEventListener('input', recalculateBalances);
 
+        // Event Listener: Save state before user types inside a cell
+        document.getElementById('preview-table').addEventListener('focusin', function(e) {
+            if (e.target.tagName === 'TD' || e.target.tagName === 'TH') {
+                saveState();
+            }
+        });
+
+        // Captures table state before any modification occurs
+        function saveState() {
+            const table = document.getElementById('preview-table');
+            if (!table) return;
+
+            // Keep history stack within limits
+            if (undoStack.length >= MAX_UNDO_LIMIT) {
+                undoStack.shift();
+            }
+
+            undoStack.push(table.innerHTML);
+
+            // Enable Undo button visually
+            const undoBtn = document.getElementById('btn-undo');
+            if (undoBtn) {
+                undoBtn.disabled = false;
+                undoBtn.style.opacity = '1';
+                undoBtn.style.cursor = 'pointer';
+            }
+        }
+
+        // Restores previous table state from history
+        function undoLastAction() {
+            if (undoStack.length === 0) return;
+
+            const table = document.getElementById('preview-table');
+            const previousState = undoStack.pop();
+
+            table.innerHTML = previousState;
+
+            // Recalculate balance matrix to ensure alignment is correct
+            recalculateBalances();
+
+            // Disable Undo button if no more history remains
+            if (undoStack.length === 0) {
+                const undoBtn = document.getElementById('btn-undo');
+                if (undoBtn) {
+                    undoBtn.disabled = true;
+                    undoBtn.style.opacity = '0.5';
+                    undoBtn.style.cursor = 'not-allowed';
+                }
+            }
+        }
+
 
         /* =========================================================================
            SMART CLEAN-UP TOOLS
            ========================================================================= */
 
         function autoDeleteNonTransactions() {
+            saveState();
             const rows = document.querySelectorAll('#preview-table tr');
             if (rows.length <= 1) return;
 
@@ -820,6 +894,7 @@
         }
 
         function cleanDuplicateHeaders() {
+            saveState();
             const rows = Array.from(document.querySelectorAll('#preview-table tr'));
             if (rows.length <= 1) return;
 
@@ -838,6 +913,7 @@
         }
 
         function cleanEmptyRows() {
+            saveState();
             const rows = document.querySelectorAll('#preview-table tr');
             let removedCount = 0;
             rows.forEach((row, index) => {
@@ -852,6 +928,7 @@
         }
 
         function promptDeleteRowByText() {
+            saveState();
             const filterText = prompt("Enter specific text to delete matching rows:");
             if (!filterText) return;
 
@@ -871,6 +948,19 @@
         }
 
         // =====================================================================
+        // NEW WORKSPACE REGISTRATION & TUNNEL (THE MISSING LINK)
+        // =====================================================================
+        let reconcilerSourceWindow = null;
+
+        // Listen for the inner Reconciler iframe registering itself
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'REGISTER_RECONCILER') {
+                reconcilerSourceWindow = event.source;
+                console.log("Parent registered the inner Reconciler iframe! Tunnel is open.");
+            }
+        });
+
+        // =====================================================================
         // PASTE THE PUSH FUNCTION HERE:
         // =====================================================================
         function pushToReconciler() {
@@ -888,20 +978,28 @@
             // C. Restore the visibility of the delete columns
             noExportElements.forEach(el => el.style.display = '');
 
-            // D. Locate your Google Apps Script Reconciler iframe
-            const iframe = document.querySelector("#reconciler-demo iframe");
-            if (!iframe) {
-                alert("Reconciler workspace is not loaded.");
-                return;
+            // D. Push the data directly to the registered inner reconciler iframe
+            if (reconcilerSourceWindow) {
+                reconcilerSourceWindow.postMessage({
+                    type: 'SET_BANK_CSV',
+                    csvData: csvString
+                }, '*');
+                console.log("Statement CSV pushed directly to the registered Reconciler frame.");
+            } else {
+                console.warn("Reconciler window has not registered with the handshake. Trying fallback...");
+                const iframe = document.querySelector("#reconciler-demo iframe");
+                if (iframe) {
+                    iframe.contentWindow.postMessage({
+                        type: 'SET_BANK_CSV',
+                        csvData: csvString
+                    }, '*');
+                } else {
+                    alert("Reconciler workspace is not loaded.");
+                    return;
+                }
             }
 
-            // E. Securely post the CSV data to your cross-origin iframe
-iframe.contentWindow.postMessage({
-    type: 'SET_BANK_CSV',
-    csvData: csvString
-}, '*'); // <-- CHANGED TO '*' TO ALLOW THE GOOGLE SANDBOX DOMAIN
-
-            // F. Automatically switch the tab view smoothly to the Reconciler
+            // E. Automatically switch the tab view smoothly to the Reconciler
             switchTab('reconciler-demo');
         }
 
