@@ -892,10 +892,10 @@
             }
 
             // E. Securely post the CSV data to your cross-origin iframe
-            iframe.contentWindow.postMessage({
-                type: 'SET_BANK_CSV',
-                csvData: csvString
-            }, 'https://script.google.com');
+iframe.contentWindow.postMessage({
+    type: 'SET_BANK_CSV',
+    csvData: csvString
+}, '*'); // <-- CHANGED TO '*' TO ALLOW THE GOOGLE SANDBOX DOMAIN
 
             // F. Automatically switch the tab view smoothly to the Reconciler
             switchTab('reconciler-demo');
