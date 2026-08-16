@@ -558,6 +558,9 @@
     <!-- =========================================================================
        NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS
        ========================================================================= -->
+    <!-- =========================================================================
+       NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS WITH AUTO-CALCULATION
+       ========================================================================= -->
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
@@ -706,11 +709,14 @@
                         const tdAction = document.createElement('td');
                         tdAction.className = "no-export";
                         tdAction.contentEditable = "false"; // Disable cell editing on delete button
-                        tdAction.innerHTML = `<button class="btn-row-delete" onclick="this.closest('tr').remove()">×</button>`;
+                        tdAction.innerHTML = `<button class="btn-row-delete" onclick="this.closest('tr').remove(); recalculateBalances();">×</button>`;
                         tr.appendChild(tdAction);
 
                         table.appendChild(tr);
                     });
+
+                    // Run initial balance calculation verification
+                    recalculateBalances();
 
                     document.getElementById('status').innerText = "Conversion ready! Review on the right.";
                     document.getElementById('clean-tools').style.display = 'block';
@@ -723,6 +729,62 @@
             };
             reader.readAsArrayBuffer(uploadedFile);
         }
+
+        /* =========================================================================
+           SMART AUTO-RECALCULATION ENGINE
+           ========================================================================= */
+        function recalculateBalances() {
+            const table = document.getElementById('preview-table');
+            const rows = Array.from(table.rows);
+            if (rows.length <= 2) return; // Need header + baseline row + at least 1 transaction
+
+            // Extract headers to map indices dynamically
+            const headers = Array.from(rows[0].cells).map(cell => cell.innerText.trim().toUpperCase());
+            const withIdx = headers.findIndex(h => h.includes("WITHDRAWAL"));
+            const depIdx = headers.findIndex(h => h.includes("DEPOSIT"));
+            const balIdx = headers.findIndex(h => h.includes("BALANCE"));
+
+            // If required columns don't exist in the parsed headers, skip calculation
+            if (withIdx === -1 || depIdx === -1 || balIdx === -1) return;
+
+            // Step 1: Read starting balance from the first data row (Row index 1)
+            const firstDataRowCells = rows[1].cells;
+            let runningBalance = cleanNum(firstDataRowCells[balIdx].innerText);
+
+            // Step 2: Loop sequentially and calculate balances for subsequent rows
+            for (let i = 2; i < rows.length; i++) {
+                const cells = rows[i].cells;
+                
+                // Safety guard for deleted or incomplete action columns
+                if (cells.length <= balIdx) continue;
+
+                const withdrawal = cleanNum(cells[withIdx].innerText);
+                const deposit = cleanNum(cells[depIdx].innerText);
+
+                // Math Formula: Prev Balance - Withdrawal + Deposit
+                runningBalance = runningBalance - withdrawal + deposit;
+
+                // Update the visual cell in the DOM
+                cells[balIdx].innerText = formatNum(runningBalance);
+            }
+        }
+
+        // Helper: Strip commas, spaces, and handle empty fields to safely convert to Float
+        function cleanNum(val) {
+            if (!val) return 0;
+            const cleaned = val.replace(/[^0-9.-]/g, ''); // Keep only numerals, dots, or minus signs
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Helper: Format number with thousand separators and 2 decimal points
+        function formatNum(num) {
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // Event Listener: Recalculate balance ledger as soon as any user input is entered
+        document.getElementById('preview-table').addEventListener('input', recalculateBalances);
+
 
         /* =========================================================================
            SMART CLEAN-UP TOOLS
@@ -749,6 +811,9 @@
                     }
                 }
             });
+            
+            // Recalculate balance matrix after cleaning up headers/noise
+            recalculateBalances();
             alert(`⚡ Smart Filter complete! Auto-deleted ${removedCount} metadata & footer rows.`);
         }
 
@@ -766,6 +831,7 @@
                     removedCount++;
                 }
             }
+            recalculateBalances();
             alert(`Cleaned up ${removedCount} repeating header rows.`);
         }
 
@@ -779,6 +845,7 @@
                     removedCount++;
                 }
             });
+            recalculateBalances();
             alert(`Deleted ${removedCount} empty rows.`);
         }
 
@@ -797,6 +864,7 @@
                     removedCount++;
                 }
             });
+            recalculateBalances();
             alert(`Deleted ${removedCount} rows matching "${filterText}".`);
         }
 
