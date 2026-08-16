@@ -159,6 +159,7 @@
         }
         .converter-left {
             width: 320px;
+            flex-shrink: 0; /* 1. Prevent the browser from squeezing this panel */
             background-color: var(--card-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
             padding: 25px;
@@ -169,6 +170,7 @@
         }
         .converter-right {
             flex-grow: 1;
+            min-width: 0; /* 2. Tell the browser to scroll the table horizontally instead of stretching the panel */
             background-color: #0d121f; /* Sleek contrasting dark slate */
             padding: 20px;
             display: flex;
