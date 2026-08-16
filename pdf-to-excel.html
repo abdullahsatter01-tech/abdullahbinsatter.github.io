@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Premium PDF to Excel Converter with Live Preview & Editor</title>
+  <title>Premium PDF to Excel Converter with Smart Deletions</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -40,6 +40,11 @@
     th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; min-width: 80px; outline: none; }
     td:focus { background-color: #eff6ff; border: 1px solid #3b82f6; box-shadow: inset 0 0 0 1px #3b82f6; }
     tr:nth-child(even) { background-color: #f8fafc; }
+
+    /* Interactive Row Delete Button */
+    .btn-row-delete { background: none; border: none; color: #ef4444; font-size: 16px; cursor: pointer; font-weight: bold; border-radius: 4px; padding: 2px 8px; transition: background 0.2s; display: block; margin: 0 auto; }
+    .btn-row-delete:hover { background: #fee2e2; }
+    th.action-col { text-align: center; width: 60px; min-width: 60px; }
   </style>
 </head>
 <body>
@@ -62,6 +67,7 @@
       <!-- Smart Clean-Up Tools -->
       <div class="tools-section" id="clean-tools" style="display: none;">
         <h3 style="font-size: 13px; color: #334155; margin-bottom: 10px;">Smart Clean-Up Tools</h3>
+        <button class="tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Delete Non-Transactions (Smart Filter)</button>
         <button class="tool-btn" onclick="cleanDuplicateHeaders()">🧹 Remove Repeating Page Headers</button>
         <button class="tool-btn" onclick="cleanEmptyRows()">🗑️ Delete All Empty Rows</button>
         <button class="tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Specific Text</button>
@@ -74,7 +80,7 @@
   <!-- Right Area (Interactive Preview) -->
   <div class="right-panel">
     <div class="preview-header">
-      <span class="preview-title">Live Spreadsheet Preview (Click cells to edit)</span>
+      <span class="preview-title">Live Spreadsheet Preview (Click cells to edit or × to delete rows)</span>
     </div>
     <div class="preview-container">
       <table id="preview-table" contenteditable="true">
@@ -84,225 +90,267 @@
   </div>
 
   <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-  let uploadedFile = null;
+    let uploadedFile = null;
 
-  function handleFile(file) {
-    if (!file) return;
-    uploadedFile = file;
-    document.getElementById('status').innerText = `File: ${file.name}`;
-    document.getElementById('btn-convert').style.display = 'block';
-  }
+    function handleFile(file) {
+      if (!file) return;
+      uploadedFile = file;
+      document.getElementById('status').innerText = `File: ${file.name}`;
+      document.getElementById('btn-convert').style.display = 'block';
+    }
 
-  async function convertToExcel() {
-    if (!uploadedFile) return;
-    document.getElementById('status').innerText = "Processing PDF...";
-    const table = document.getElementById('preview-table');
-    table.innerHTML = ""; // Clear old preview
+    async function convertToExcel() {
+      if (!uploadedFile) return;
+      document.getElementById('status').innerText = "Processing PDF...";
+      const table = document.getElementById('preview-table');
+      table.innerHTML = ""; // Clear old preview
 
-    const reader = new FileReader();
-    reader.onload = async function() {
-      const typedarray = new Uint8Array(this.result);
-      
-      try {
-        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-        let allTransactions = [];
-        let detectedHeaders = null;
-        let colBounds = [];
+      const reader = new FileReader();
+      reader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        
+        try {
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+          const allTransactions = [];
+          let detectedHeaders = null;
+          let colBounds = [];
 
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          const textContent = await page.getTextContent();
-          
-          // 1. Group text items into rows by vertical alignment with a 4px tolerance
-          const rowsY = [];
-          textContent.items.forEach(item => {
-            const y = item.transform[5]; // Vertical coordinate
-            const text = item.str.trim();
-            if (text === "") return;
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
             
-            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 4);
-            if (foundRow) {
-              foundRow.items.push(item);
-            } else {
-              rowsY.push({ y: y, items: [item] });
-            }
-          });
-
-          // Sort rows from top to bottom
-          rowsY.sort((a, b) => b.y - a.y);
-
-          // 2. Locate the header row containing DATE, DESCRIPTION, and BALANCE
-          let headerRow = null;
-          for (let r of rowsY) {
-            const rowText = r.items.map(it => it.str.toUpperCase());
-            const hasDate = rowText.some(t => t.includes("DATE"));
-            const hasDesc = rowText.some(t => t.includes("DESCRIPTION"));
-            const hasBal = rowText.some(t => t.includes("BALANCE"));
-            
-            if (hasDate && hasDesc && hasBal) {
-              headerRow = r;
-              break;
-            }
-          }
-
-          // If header row is found, calculate column boundaries based on X coordinates
-          if (headerRow && !detectedHeaders) {
-            // Sort header items from left to right (X coordinate)
-            const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
-            detectedHeaders = headerItems.map(it => it.str.trim().toUpperCase());
-            
-            const headerXs = headerItems.map(it => it.transform[4]);
-            
-            // Calculate midpoints between headers to establish boundaries
-            colBounds = [];
-            for (let i = 0; i < headerXs.length - 1; i++) {
-              colBounds.push((headerXs[i] + headerXs[i+1]) / 2);
-            }
-          }
-
-          if (!detectedHeaders) continue; // Skip pages without headers detected yet
-
-          // 3. Process data rows below the header
-          rowsY.forEach(r => {
-            // Only process lines physically below the header on this page
-            if (headerRow && r.y >= headerRow.y) return; 
-
-            const cells = Array(detectedHeaders.length).fill("");
-            
-            r.items.forEach(item => {
-              const x = item.transform[4]; // Horizontal coordinate
+            // Group text items into rows by vertical alignment with a 4px tolerance
+            const rowsY = [];
+            textContent.items.forEach(item => {
+              const y = item.transform[5];
+              const text = item.str.trim();
+              if (text === "") return;
               
-              // Find which column boundary this text element belongs to
-              let colIdx = 0;
-              while (colIdx < colBounds.length && x > colBounds[colIdx]) {
-                colIdx++;
+              let foundRow = rowsY.find(r => Math.abs(r.y - y) < 4);
+              if (foundRow) {
+                foundRow.items.push(item);
+              } else {
+                rowsY.push({ y: y, items: [item] });
               }
-              cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
             });
 
-            // Only add rows that contain some text
-            if (cells.some(c => c !== "")) {
-              allTransactions.push(cells);
+            // Sort rows from top to bottom
+            rowsY.sort((a, b) => b.y - a.y);
+
+            // Locate the header row
+            let headerRow = null;
+            for (let r of rowsY) {
+              const rowText = r.items.map(it => it.str.toUpperCase());
+              const hasDate = rowText.some(t => t.includes("DATE"));
+              const hasDesc = rowText.some(t => t.includes("DESCRIPTION"));
+              const hasBal = rowText.some(t => t.includes("BALANCE"));
+              
+              if (hasDate && hasDesc && hasBal) {
+                headerRow = r;
+                break;
+              }
             }
-          });
-        }
 
-        if (allTransactions.length === 0) {
-          document.getElementById('status').innerText = "Parsing failed. Is this scanned?";
-          return;
-        }
-
-        // 4. Smart Post-Processing: Merge multi-line transaction descriptions
-        const finalTransactions = [];
-        allTransactions.forEach(row => {
-          const hasDate = row[0] !== "";
-          const hasAmount = row[3] !== "" || row[4] !== "" || row[5] !== "";
-          const descriptionValue = row[1];
-
-          // If a row has no date and no amounts, but contains description text, 
-          // it is a continuation of the description from the row above!
-          if (!hasDate && !hasAmount && descriptionValue !== "") {
-            if (finalTransactions.length > 0) {
-              const lastRow = finalTransactions[finalTransactions.length - 1];
-              lastRow[1] = (lastRow[1] + " " + descriptionValue).trim();
+            // Calculate boundaries based on X coordinates of headers
+            if (headerRow && !detectedHeaders) {
+              const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
+              detectedHeaders = headerItems.map(it => it.str.trim().toUpperCase());
+              const headerXs = headerItems.map(it => it.transform[4]);
+              
+              colBounds = [];
+              for (let i = 0; i < headerXs.length - 1; i++) {
+                colBounds.push((headerXs[i] + headerXs[i+1]) / 2);
+              }
             }
-          } else {
-            finalTransactions.push(row);
+
+            if (!detectedHeaders) continue;
+
+            // Process data rows below header
+            rowsY.forEach(r => {
+              if (headerRow && r.y >= headerRow.y) return; 
+
+              const cells = Array(detectedHeaders.length).fill("");
+              
+              r.items.forEach(item => {
+                const x = item.transform[4];
+                let colIdx = 0;
+                while (colIdx < colBounds.length && x > colBounds[colIdx]) {
+                  colIdx++;
+                }
+                cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
+              });
+
+              if (cells.some(c => c !== "")) {
+                allTransactions.push(cells);
+              }
+            });
           }
-        });
 
-        // 5. Build the Clean Interactive HTML Table UI
-        // Add header row first
-        const trHeader = document.createElement('tr');
-        detectedHeaders.forEach(headerText => {
-          const th = document.createElement('th');
-          th.innerText = headerText;
-          trHeader.appendChild(th);
-        });
-        table.appendChild(trHeader);
+          if (allTransactions.length === 0) {
+            document.getElementById('status').innerText = "Parsing failed.";
+            return;
+          }
 
-        // Add transaction data rows
-        finalTransactions.forEach(row => {
-          const tr = document.createElement('tr');
-          row.forEach(cellText => {
-            const td = document.createElement('td');
-            td.innerText = cellText;
-            tr.appendChild(td);
+          // Smart Post-Processing: Merge multi-line descriptions
+          const finalTransactions = [];
+          allTransactions.forEach(row => {
+            const hasDate = row[0] !== "";
+            const hasAmount = row[3] !== "" || row[4] !== "" || row[5] !== "";
+            const descriptionValue = row[1];
+
+            if (!hasDate && !hasAmount && descriptionValue !== "") {
+              if (finalTransactions.length > 0) {
+                const lastRow = finalTransactions[finalTransactions.length - 1];
+                lastRow[1] = (lastRow[1] + " " + descriptionValue).trim();
+              }
+            } else {
+              finalTransactions.push(row);
+            }
           });
-          table.appendChild(tr);
-        });
 
-        document.getElementById('status').innerText = "Conversion ready! Review on the right.";
-        document.getElementById('clean-tools').style.display = 'block';
-        document.getElementById('btn-download').style.display = 'block';
+          // Build Interactive HTML Table UI
+          // 1. Build Header Row (Add extra Action column at the end)
+          const trHeader = document.createElement('tr');
+          detectedHeaders.forEach(headerText => {
+            const th = document.createElement('th');
+            th.innerText = headerText;
+            trHeader.appendChild(th);
+          });
+          const thAction = document.createElement('th');
+          thAction.innerText = "ACTIONS";
+          thAction.className = "action-col no-export"; // Add class to ignore on export
+          trHeader.appendChild(thAction);
+          table.appendChild(trHeader);
 
-      } catch (error) {
-        console.error(error);
-        document.getElementById('status').innerText = "Parsing error.";
-      }
-    };
-    reader.readAsArrayBuffer(uploadedFile);
-  }
+          // 2. Build Data Rows (Add individual delete buttons)
+          finalTransactions.forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach(cellText => {
+              const td = document.createElement('td');
+              td.innerText = cellText;
+              tr.appendChild(td);
+            });
+            
+            // Add Delete Action Cell
+            const tdAction = document.createElement('td');
+            tdAction.className = "no-export";
+            tdAction.contentEditable = "false"; // Disable cell editing on the delete button
+            tdAction.innerHTML = `<button class="btn-row-delete" onclick="this.closest('tr').remove()">×</button>`;
+            tr.appendChild(tdAction);
 
-  // Smart Clean-Up Tools
-  function cleanDuplicateHeaders() {
-    const rows = Array.from(document.querySelectorAll('#preview-table tr'));
-    if (rows.length <= 1) return;
+            table.appendChild(tr);
+          });
 
-    const headerText = Array.from(rows[0].querySelectorAll('th')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
-    let removedCount = 0;
+          document.getElementById('status').innerText = "Conversion ready! Review on the right.";
+          document.getElementById('clean-tools').style.display = 'block';
+          document.getElementById('btn-download').style.display = 'block';
 
-    for (let i = 1; i < rows.length; i++) {
-      const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
-      if (rowText === headerText) {
-        rows[i].remove();
-        removedCount++;
-      }
+        } catch (error) {
+          console.error(error);
+          document.getElementById('status').innerText = "Parsing error.";
+        }
+      };
+      reader.readAsArrayBuffer(uploadedFile);
     }
-    alert(`Cleaned up ${removedCount} repeating header rows across pages.`);
-  }
 
-  function cleanEmptyRows() {
-    const rows = document.querySelectorAll('#preview-table tr');
-    let removedCount = 0;
-    rows.forEach((row, index) => {
-      if (index === 0) return;
-      if (row.innerText.trim() === "") {
-        row.remove();
-        removedCount++;
+    /* =========================================================================
+       SMART CLEAN-UP TOOLS
+       ========================================================================= */
+
+    // New Tool: Deletes any row that does not start with a valid date pattern
+    function autoDeleteNonTransactions() {
+      const rows = document.querySelectorAll('#preview-table tr');
+      if (rows.length <= 1) return;
+
+      // Matches formats: DD-MM-YYYY, DD/MM/YYYY, D-M-YY, etc.
+      const dateRegex = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}$/;
+      let removedCount = 0;
+
+      rows.forEach((row, index) => {
+        if (index === 0) return; // Save main headers
+
+        // Select the first column (Date cell) in this row
+        const dateCell = row.querySelector('td');
+        if (dateCell) {
+          const cellText = dateCell.innerText.trim();
+          
+          // If the date column doesn't match a date pattern, delete the row
+          if (!dateRegex.test(cellText)) {
+            row.remove();
+            removedCount++;
+          }
+        }
+      });
+      alert(`⚡ Smart Filter complete! Auto-deleted ${removedCount} metadata & footer rows.`);
+    }
+
+    function cleanDuplicateHeaders() {
+      const rows = Array.from(document.querySelectorAll('#preview-table tr'));
+      if (rows.length <= 1) return;
+
+      const headerText = Array.from(rows[0].querySelectorAll('th')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+      let removedCount = 0;
+
+      for (let i = 1; i < rows.length; i++) {
+        const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+        if (rowText === headerText) {
+          rows[i].remove();
+          removedCount++;
+        }
       }
-    });
-    alert(`Deleted ${removedCount} empty rows.`);
-  }
+      alert(`Cleaned up ${removedCount} repeating header rows.`);
+    }
 
-  function promptDeleteRowByText() {
-    const filterText = prompt("Enter specific text to delete matching rows:");
-    if (!filterText) return;
+    function cleanEmptyRows() {
+      const rows = document.querySelectorAll('#preview-table tr');
+      let removedCount = 0;
+      rows.forEach((row, index) => {
+        if (index === 0) return;
+        if (row.innerText.trim() === "") {
+          row.remove();
+          removedCount++;
+        }
+      });
+      alert(`Deleted ${removedCount} empty rows.`);
+    }
 
-    const lowerFilter = filterText.toLowerCase().trim();
-    const rows = document.querySelectorAll('#preview-table tr');
-    let removedCount = 0;
+    function promptDeleteRowByText() {
+      const filterText = prompt("Enter specific text to delete matching rows:");
+      if (!filterText) return;
 
-    rows.forEach((row, index) => {
-      if (index === 0) return;
-      if (row.innerText.toLowerCase().includes(lowerFilter)) {
-        row.remove();
-        removedCount++;
-      }
-    });
-    alert(`Deleted ${removedCount} rows matching "${filterText}".`);
-  }
+      const lowerFilter = filterText.toLowerCase().trim();
+      const rows = document.querySelectorAll('#preview-table tr');
+      let removedCount = 0;
 
-  function downloadExcel() {
-    const table = document.getElementById('preview-table');
-    if (table.rows.length === 0) return;
+      rows.forEach((row, index) => {
+        if (index === 0) return;
+        if (row.innerText.toLowerCase().includes(lowerFilter)) {
+          row.remove();
+          removedCount++;
+        }
+      });
+      alert(`Deleted ${removedCount} rows matching "${filterText}".`);
+    }
 
-    const workbook = XLSX.utils.table_to_book(table);
-    XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
-  }
+    // Modernized Download Function to ignore "no-export" columns
+    function downloadExcel() {
+      const table = document.getElementById('preview-table');
+      if (table.rows.length === 0) return;
 
+      // 1. Temporarily hide all columns marked as 'no-export' (the Action header & delete buttons)
+      const noExportElements = document.querySelectorAll('.no-export');
+      noExportElements.forEach(el => el.style.display = 'none');
+
+      // 2. Compile table to SheetJS
+      const workbook = XLSX.utils.table_to_book(table);
+
+      // 3. Immediately restore the visibility of the elements back in the browser
+      noExportElements.forEach(el => el.style.display = '');
+
+      XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
+    }
   </script>
 </body>
 </html>
