@@ -84,150 +84,225 @@
   </div>
 
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-    let uploadedFile = null;
+  let uploadedFile = null;
 
-    function handleFile(file) {
-      if (!file) return;
-      uploadedFile = file;
-      document.getElementById('status').innerText = `File: ${file.name}`;
-      document.getElementById('btn-convert').style.display = 'block';
-    }
+  function handleFile(file) {
+    if (!file) return;
+    uploadedFile = file;
+    document.getElementById('status').innerText = `File: ${file.name}`;
+    document.getElementById('btn-convert').style.display = 'block';
+  }
 
-    async function convertToExcel() {
-      if (!uploadedFile) return;
-      document.getElementById('status').innerText = "Processing PDF...";
-      const table = document.getElementById('preview-table');
-      table.innerHTML = ""; // Clear old preview
+  async function convertToExcel() {
+    if (!uploadedFile) return;
+    document.getElementById('status').innerText = "Processing PDF...";
+    const table = document.getElementById('preview-table');
+    table.innerHTML = ""; // Clear old preview
 
-      const reader = new FileReader();
-      reader.onload = async function() {
-        const typedarray = new Uint8Array(this.result);
-        
-        try {
-          const pdf = await pdfjsLib.getDocument(typedarray).promise;
-          const excelData = [];
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const typedarray = new Uint8Array(this.result);
+      
+      try {
+        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+        let allTransactions = [];
+        let detectedHeaders = null;
+        let colBounds = [];
 
-          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum);
-            const textContent = await page.getTextContent();
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          const textContent = await page.getTextContent();
+          
+          // 1. Group text items into rows by vertical alignment with a 4px tolerance
+          const rowsY = [];
+          textContent.items.forEach(item => {
+            const y = item.transform[5]; // Vertical coordinate
+            const text = item.str.trim();
+            if (text === "") return;
             
-            const lines = {};
-            textContent.items.forEach(item => {
-              const y = Math.round(item.transform[5]);
-              if (!lines[y]) lines[y] = [];
-              lines[y].push(item);
-            });
-
-            const sortedY = Object.keys(lines).sort((a, b) => b - a);
-
-            sortedY.forEach(y => {
-              const rowItems = lines[y].sort((a, b) => a.transform[4] - b.transform[4]);
-              const rowData = rowItems.map(item => item.str.trim()).filter(str => str !== "");
-              if (rowData.length > 0) {
-                excelData.push(rowData);
-              }
-            });
-          }
-
-          if (excelData.length === 0) {
-            document.getElementById('status').innerText = "Parsing failed. Is this scanned?";
-            return;
-          }
-
-          // Build Interactive HTML Table
-          excelData.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            
-            // Treat the first parsed row as the Table Header (th)
-            row.forEach(cellText => {
-              const cell = document.createElement(index === 0 ? 'th' : 'td');
-              cell.innerText = cellText;
-              tr.appendChild(cell);
-            });
-            table.appendChild(tr);
+            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 4);
+            if (foundRow) {
+              foundRow.items.push(item);
+            } else {
+              rowsY.push({ y: y, items: [item] });
+            }
           });
 
-          document.getElementById('status').innerText = "Conversion ready! Review on the right.";
-          document.getElementById('clean-tools').style.display = 'block';
-          document.getElementById('btn-download').style.display = 'block';
+          // Sort rows from top to bottom
+          rowsY.sort((a, b) => b.y - a.y);
 
-        } catch (error) {
-          console.error(error);
-          document.getElementById('status').innerText = "Parsing error.";
+          // 2. Locate the header row containing DATE, DESCRIPTION, and BALANCE
+          let headerRow = null;
+          for (let r of rowsY) {
+            const rowText = r.items.map(it => it.str.toUpperCase());
+            const hasDate = rowText.some(t => t.includes("DATE"));
+            const hasDesc = rowText.some(t => t.includes("DESCRIPTION"));
+            const hasBal = rowText.some(t => t.includes("BALANCE"));
+            
+            if (hasDate && hasDesc && hasBal) {
+              headerRow = r;
+              break;
+            }
+          }
+
+          // If header row is found, calculate column boundaries based on X coordinates
+          if (headerRow && !detectedHeaders) {
+            // Sort header items from left to right (X coordinate)
+            const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
+            detectedHeaders = headerItems.map(it => it.str.trim().toUpperCase());
+            
+            const headerXs = headerItems.map(it => it.transform[4]);
+            
+            // Calculate midpoints between headers to establish boundaries
+            colBounds = [];
+            for (let i = 0; i < headerXs.length - 1; i++) {
+              colBounds.push((headerXs[i] + headerXs[i+1]) / 2);
+            }
+          }
+
+          if (!detectedHeaders) continue; // Skip pages without headers detected yet
+
+          // 3. Process data rows below the header
+          rowsY.forEach(r => {
+            // Only process lines physically below the header on this page
+            if (headerRow && r.y >= headerRow.y) return; 
+
+            const cells = Array(detectedHeaders.length).fill("");
+            
+            r.items.forEach(item => {
+              const x = item.transform[4]; // Horizontal coordinate
+              
+              // Find which column boundary this text element belongs to
+              let colIdx = 0;
+              while (colIdx < colBounds.length && x > colBounds[colIdx]) {
+                colIdx++;
+              }
+              cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
+            });
+
+            // Only add rows that contain some text
+            if (cells.some(c => c !== "")) {
+              allTransactions.push(cells);
+            }
+          });
         }
-      };
-      reader.readAsArrayBuffer(uploadedFile);
-    }
 
-    /* =========================================================================
-       SMART CLEAN-UP TOOLS (THE "MODIFICATION HINT" LOGIC)
-       ========================================================================= */
-
-    // 1. Clean repeating headers (deletes rows on pages 2+ that match the header row)
-    function cleanDuplicateHeaders() {
-      const rows = Array.from(document.querySelectorAll('#preview-table tr'));
-      if (rows.length <= 1) return;
-
-      // Extract text content of the very first row (header template)
-      const headerText = Array.from(rows[0].querySelectorAll('th, td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
-
-      let removedCount = 0;
-      // Skip row 0 (the actual header), check all subsequent rows
-      for (let i = 1; i < rows.length; i++) {
-        const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
-        if (rowText === headerText) {
-          rows[i].remove();
-          removedCount++;
+        if (allTransactions.length === 0) {
+          document.getElementById('status').innerText = "Parsing failed. Is this scanned?";
+          return;
         }
+
+        // 4. Smart Post-Processing: Merge multi-line transaction descriptions
+        const finalTransactions = [];
+        allTransactions.forEach(row => {
+          const hasDate = row[0] !== "";
+          const hasAmount = row[3] !== "" || row[4] !== "" || row[5] !== "";
+          const descriptionValue = row[1];
+
+          // If a row has no date and no amounts, but contains description text, 
+          // it is a continuation of the description from the row above!
+          if (!hasDate && !hasAmount && descriptionValue !== "") {
+            if (finalTransactions.length > 0) {
+              const lastRow = finalTransactions[finalTransactions.length - 1];
+              lastRow[1] = (lastRow[1] + " " + descriptionValue).trim();
+            }
+          } else {
+            finalTransactions.push(row);
+          }
+        });
+
+        // 5. Build the Clean Interactive HTML Table UI
+        // Add header row first
+        const trHeader = document.createElement('tr');
+        detectedHeaders.forEach(headerText => {
+          const th = document.createElement('th');
+          th.innerText = headerText;
+          trHeader.appendChild(th);
+        });
+        table.appendChild(trHeader);
+
+        // Add transaction data rows
+        finalTransactions.forEach(row => {
+          const tr = document.createElement('tr');
+          row.forEach(cellText => {
+            const td = document.createElement('td');
+            td.innerText = cellText;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+
+        document.getElementById('status').innerText = "Conversion ready! Review on the right.";
+        document.getElementById('clean-tools').style.display = 'block';
+        document.getElementById('btn-download').style.display = 'block';
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById('status').innerText = "Parsing error.";
       }
-      alert(`Cleaned up ${removedCount} repeating header rows across pages.`);
+    };
+    reader.readAsArrayBuffer(uploadedFile);
+  }
+
+  // Smart Clean-Up Tools
+  function cleanDuplicateHeaders() {
+    const rows = Array.from(document.querySelectorAll('#preview-table tr'));
+    if (rows.length <= 1) return;
+
+    const headerText = Array.from(rows[0].querySelectorAll('th')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+    let removedCount = 0;
+
+    for (let i = 1; i < rows.length; i++) {
+      const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+      if (rowText === headerText) {
+        rows[i].remove();
+        removedCount++;
+      }
     }
+    alert(`Cleaned up ${removedCount} repeating header rows across pages.`);
+  }
 
-    // 2. Clean empty rows (deletes rows with no visible data)
-    function cleanEmptyRows() {
-      const rows = document.querySelectorAll('#preview-table tr');
-      let removedCount = 0;
-      rows.forEach((row, index) => {
-        if (index === 0) return; // Save header
-        const text = row.innerText.trim();
-        if (text === "") {
-          row.remove();
-          removedCount++;
-        }
-      });
-      alert(`Deleted ${removedCount} completely empty rows.`);
-    }
+  function cleanEmptyRows() {
+    const rows = document.querySelectorAll('#preview-table tr');
+    let removedCount = 0;
+    rows.forEach((row, index) => {
+      if (index === 0) return;
+      if (row.innerText.trim() === "") {
+        row.remove();
+        removedCount++;
+      }
+    });
+    alert(`Deleted ${removedCount} empty rows.`);
+  }
 
-    // 3. User can input specific text, and the app will delete every row across the statement containing it (e.g. footers like "Page 1 of 5")
-    function promptDeleteRowByText() {
-      const filterText = prompt("Enter specific text to delete matching rows (e.g. 'Opening Balance' or 'Statement of Account'):");
-      if (!filterText) return;
+  function promptDeleteRowByText() {
+    const filterText = prompt("Enter specific text to delete matching rows:");
+    if (!filterText) return;
 
-      const lowerFilter = filterText.toLowerCase().trim();
-      const rows = document.querySelectorAll('#preview-table tr');
-      let removedCount = 0;
+    const lowerFilter = filterText.toLowerCase().trim();
+    const rows = document.querySelectorAll('#preview-table tr');
+    let removedCount = 0;
 
-      rows.forEach((row, index) => {
-        if (index === 0) return; // Keep main header
-        const rowContent = row.innerText.toLowerCase();
-        if (rowContent.includes(lowerFilter)) {
-          row.remove();
-          removedCount++;
-        }
-      });
-      alert(`Deleted ${removedCount} rows matching "${filterText}".`);
-    }
+    rows.forEach((row, index) => {
+      if (index === 0) return;
+      if (row.innerText.toLowerCase().includes(lowerFilter)) {
+        row.remove();
+        removedCount++;
+      }
+    });
+    alert(`Deleted ${removedCount} rows matching "${filterText}".`);
+  }
 
-    // Generate and Download Excel directly from the edited HTML table
-    function downloadExcel() {
-      const table = document.getElementById('preview-table');
-      if (table.rows.length === 0) return;
+  function downloadExcel() {
+    const table = document.getElementById('preview-table');
+    if (table.rows.length === 0) return;
 
-      const workbook = XLSX.utils.table_to_book(table);
-      XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
-    }
+    const workbook = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
+  }
+
   </script>
 </body>
 </html>
