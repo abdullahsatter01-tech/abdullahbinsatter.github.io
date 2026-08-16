@@ -154,15 +154,15 @@
            ========================================================================= */
         .converter-workspace {
             display: flex;
-            height: 800px; /* INCREASED from 700px to make the workspace bigger */
+            height: 800px; /* Workspace height */
             background-color: var(--dark-bg);
         }
         .converter-left {
-            width: 256px; /* DECREASED by 20% (was 320px) to make the panel sleeker */
-            flex-shrink: 0; /* Prevents the browser from squeezing this panel when tables are wide */
+            width: 256px; /* 20% Smaller Sidebar */
+            flex-shrink: 0; /* Prevents browser from squeezing panel */
             background-color: var(--card-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px 15px; /* Slightly tighter padding for a cleaner look */
+            padding: 20px 15px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -170,8 +170,8 @@
         }
         .converter-right {
             flex-grow: 1;
-            min-width: 0; /* Forces horizontal scroll on wide spreadsheet elements instead of shrinking layout */
-            background-color: #0d121f; /* Sleek contrasting dark slate */
+            min-width: 0; /* Allows container to stay responsive */
+            background-color: #0d121f; 
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -262,8 +262,9 @@
         .preview-container table {
             border-collapse: collapse;
             width: 100%;
-            font-size: 0.85rem; /* SLIGHTLY BIGGER text for increased readability */
+            font-size: 0.85rem; /* Larger, readable text */
             color: var(--text-main);
+            table-layout: fixed; /* Dynamic column math constraints */
         }
         .preview-container th {
             background-color: #1f2937;
@@ -279,9 +280,8 @@
         .preview-container th, .preview-container td {
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 10px 12px;
-            text-align: left;
-            min-width: 90px;
             outline: none;
+            word-break: break-word; /* Allows text inside cells to wrap cleanly */
         }
         .preview-container td:focus {
             background-color: rgba(0, 229, 255, 0.05);
@@ -291,6 +291,13 @@
         .preview-container tr:nth-child(even) {
             background-color: rgba(255, 255, 255, 0.01);
         }
+
+        /* Professional Column Sizing Rules */
+        .col-date { width: 100px; min-width: 100px; text-align: center !important; }
+        .col-desc { text-align: left !important; } /* Let description consume all remaining space */
+        .col-ref { width: 90px; min-width: 90px; text-align: center !important; }
+        .col-amount { width: 110px; min-width: 110px; text-align: right !important; }
+        .col-action { width: 80px; min-width: 80px; text-align: center !important; }
 
         /* Action Deletions Column */
         .btn-row-delete {
@@ -308,11 +315,6 @@
         }
         .btn-row-delete:hover {
             background-color: rgba(239, 68, 68, 0.15);
-        }
-        th.action-col {
-            text-align: center;
-            width: 70px;
-            min-width: 70px;
         }
 
         /* Legacy fallback for manual buttons */
@@ -706,31 +708,41 @@
                     });
 
                     // Build Interactive HTML Table UI
-                    // 1. Build Header Row (Add extra Action column at the end)
+                    // 1. Build Header Row (Add custom classes and extra Action column at the end)
                     const trHeader = document.createElement('tr');
-                    detectedHeaders.forEach(headerText => {
+                    detectedHeaders.forEach((headerText, colIdx) => {
                         const th = document.createElement('th');
                         th.innerText = headerText;
+                        // Assign structural classes
+                        if (colIdx === 0) th.className = "col-date";
+                        else if (colIdx === 1) th.className = "col-desc";
+                        else if (colIdx === 2) th.className = "col-ref";
+                        else if (colIdx === 3 || colIdx === 4 || colIdx === 5) th.className = "col-amount";
                         trHeader.appendChild(th);
                     });
                     const thAction = document.createElement('th');
                     thAction.innerText = "ACTIONS";
-                    thAction.className = "action-col no-export"; // Ignore on export
+                    thAction.className = "col-action no-export"; // Ignore on export
                     trHeader.appendChild(thAction);
                     table.appendChild(trHeader);
 
                     // 2. Build Data Rows (Add individual delete buttons)
                     finalTransactions.forEach(row => {
                         const tr = document.createElement('tr');
-                        row.forEach(cellText => {
+                        row.forEach((cellText, colIdx) => {
                             const td = document.createElement('td');
                             td.innerText = cellText;
+                            // Assign structural classes
+                            if (colIdx === 0) td.className = "col-date";
+                            else if (colIdx === 1) td.className = "col-desc";
+                            else if (colIdx === 2) td.className = "col-ref";
+                            else if (colIdx === 3 || colIdx === 4 || colIdx === 5) td.className = "col-amount";
                             tr.appendChild(td);
                         });
                         
                         // Add Delete Action Cell
                         const tdAction = document.createElement('td');
-                        tdAction.className = "no-export";
+                        tdAction.className = "col-action no-export";
                         tdAction.contentEditable = "false"; // Disable cell editing on delete button
                         tdAction.innerHTML = `<button class="btn-row-delete" onclick="saveState(); this.closest('tr').remove(); recalculateBalances();">×</button>`;
                         tr.appendChild(tdAction);
