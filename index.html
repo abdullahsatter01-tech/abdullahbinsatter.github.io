@@ -445,7 +445,7 @@
                                 <button class="conv-tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Text</button>
                             </div>
                         </div>
-
+                        <button id="btn-push" class="conv-btn conv-btn-convert" style="display:none; background-color: var(--primary); color: #0b0f19; margin-bottom: 10px;" onclick="pushToReconciler()">⚡ Push to Bank Reconciler</button>
                         <button id="btn-download" class="conv-btn conv-btn-download" style="display:none;" onclick="downloadExcel()">Download Excel Sheet</button>
                     </div>
 
@@ -555,9 +555,6 @@
         </div>
     </footer>
 
-    <!-- =========================================================================
-       NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS
-       ========================================================================= -->
     <!-- =========================================================================
        NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS WITH AUTO-CALCULATION
        ========================================================================= -->
@@ -721,6 +718,7 @@
                     document.getElementById('status').innerText = "Conversion ready! Review on the right.";
                     document.getElementById('clean-tools').style.display = 'block';
                     document.getElementById('btn-download').style.display = 'block';
+                    document.getElementById('btn-push').style.display = 'block';
 
                 } catch (error) {
                     console.error(error);
@@ -868,6 +866,44 @@
             alert(`Deleted ${removedCount} rows matching "${filterText}".`);
         }
 
+        // =====================================================================
+        // PASTE THE PUSH FUNCTION HERE:
+        // =====================================================================
+        function pushToReconciler() {
+            const table = document.getElementById('preview-table');
+            if (table.rows.length === 0) return;
+
+            // A. Temporarily hide 'no-export' columns (the delete buttons)
+            const noExportElements = document.querySelectorAll('.no-export');
+            noExportElements.forEach(el => el.style.display = 'none');
+
+            // B. Convert the edited on-screen HTML table into a clean CSV string using SheetJS
+            const worksheet = XLSX.utils.table_to_sheet(table);
+            const csvString = XLSX.utils.sheet_to_csv(worksheet);
+
+            // C. Restore the visibility of the delete columns
+            noExportElements.forEach(el => el.style.display = '');
+
+            // D. Locate your Google Apps Script Reconciler iframe
+            const iframe = document.querySelector("#reconciler-demo iframe");
+            if (!iframe) {
+                alert("Reconciler workspace is not loaded.");
+                return;
+            }
+
+            // E. Securely post the CSV data to your cross-origin iframe
+            iframe.contentWindow.postMessage({
+                type: 'SET_BANK_CSV',
+                csvData: csvString
+            }, 'https://script.google.com');
+
+            // F. Automatically switch the tab view smoothly to the Reconciler
+            switchTab('reconciler-demo');
+        }
+
+        // =====================================================================
+        // EXISTING DOWNLOAD FUNCTION (Keep below the push function):
+        // =====================================================================
         function downloadExcel() {
             const table = document.getElementById('preview-table');
             if (table.rows.length === 0) return;
