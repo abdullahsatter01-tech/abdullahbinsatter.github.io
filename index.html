@@ -154,15 +154,15 @@
            ========================================================================= */
         .converter-workspace {
             display: flex;
-            height: 700px;
+            height: 800px; /* INCREASED from 700px to make the workspace bigger */
             background-color: var(--dark-bg);
         }
         .converter-left {
-            width: 320px;
+            width: 256px; /* DECREASED by 20% (was 320px) to make the panel sleeker */
             flex-shrink: 0; /* Prevents the browser from squeezing this panel when tables are wide */
             background-color: var(--card-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 25px;
+            padding: 20px 15px; /* Slightly tighter padding for a cleaner look */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -262,7 +262,7 @@
         .preview-container table {
             border-collapse: collapse;
             width: 100%;
-            font-size: 0.8rem;
+            font-size: 0.85rem; /* SLIGHTLY BIGGER text for increased readability */
             color: var(--text-main);
         }
         .preview-container th {
@@ -428,7 +428,7 @@
         </div>
     </main>
 
-    <!-- TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
+    <!-- NEW TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
     <main id="pdf-to-excel-demo" class="tab-content">
         <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="web-app-frame-wrapper">
