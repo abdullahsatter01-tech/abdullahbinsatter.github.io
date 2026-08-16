@@ -15,6 +15,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GCP Automation Studio - Workspace Tools</title>
+    
+    <!-- PDF.js and SheetJS Libraries Integrated Safely via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         :root {
             --primary: #00e5ff;
@@ -24,6 +29,8 @@
             --nav-bg: #111827;
             --text-main: #ffffff;
             --text-muted: #9ca3af;
+            --danger: #ef4444;
+            --success: #10b981;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
@@ -142,6 +149,186 @@
         .setup-step strong { color: #fff; font-size: 1.1rem; display: block; margin-bottom: 4px; }
         .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
+        /* =========================================================================
+           NATIVE SPLIT-SCREEN PDF TO EXCEL CONVERTER STYLES
+           ========================================================================= */
+        .converter-workspace {
+            display: flex;
+            height: 700px;
+            background-color: var(--dark-bg);
+        }
+        .converter-left {
+            width: 320px;
+            background-color: var(--card-bg);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+        }
+        .converter-right {
+            flex-grow: 1;
+            background-color: #0d121f; /* Sleek contrasting dark slate */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .converter-upload-box {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.2s;
+        }
+        .converter-upload-box:hover {
+            border-color: var(--primary);
+            background: rgba(0, 229, 255, 0.03);
+        }
+        .conv-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+        .conv-btn-convert {
+            background-color: var(--primary);
+            color: #0b0f19;
+        }
+        .conv-btn-convert:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+        }
+        .conv-btn-download {
+            background-color: var(--success);
+            color: white;
+            margin-top: auto;
+        }
+        .conv-btn-download:hover {
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+        }
+        .conv-tools-section {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+        .conv-tool-btn {
+            display: block;
+            width: 100%;
+            background: #1f2937;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border: 1px solid #374151;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .conv-tool-btn:hover {
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Spreadsheet Layout & Focus Highlighter */
+        .preview-header-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .preview-container {
+            flex-grow: 1;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: auto;
+        }
+        .preview-container table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.8rem;
+            color: var(--text-main);
+        }
+        .preview-container th {
+            background-color: #1f2937;
+            color: var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .preview-container th, .preview-container td {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 12px;
+            text-align: left;
+            min-width: 90px;
+            outline: none;
+        }
+        .preview-container td:focus {
+            background-color: rgba(0, 229, 255, 0.05);
+            border: 1px solid var(--primary);
+            box-shadow: inset 0 0 0 1px var(--primary);
+        }
+        .preview-container tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Action Deletions Column */
+        .btn-row-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 1px 8px;
+            transition: all 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+        .btn-row-delete:hover {
+            background-color: rgba(239, 68, 68, 0.15);
+        }
+        th.action-col {
+            text-align: center;
+            width: 70px;
+            min-width: 70px;
+        }
+
+        /* Responsive stack for Mobile viewports */
+        @media (max-width: 768px) {
+            .converter-workspace {
+                flex-direction: column;
+                height: auto;
+            }
+            .converter-left {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .converter-right {
+                height: 500px;
+            }
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -181,8 +368,8 @@
 
     <div class="tabs-container">
         <button class="tab-btn active" onclick="switchTab('reconciler-demo')">📊 Free Bank Reconciler</button>
+        <button class="tab-btn" onclick="switchTab('pdf-to-excel-demo')">📈 Free PDF to Excel</button>
         <button class="tab-btn" onclick="switchTab('bill-demo')">📁 Free Gmail addon for Bill processing</button>
-        <!-- NEW TAB BUTTON -->
         <button class="tab-btn" onclick="switchTab('new-app-demo')">⚡ Free PDF Merger</button>
     </div>
 
@@ -221,7 +408,67 @@
         </div>
     </main>
 
-    <!-- TAB 2: Free Gmail addon for Bill processing -->
+    <!-- NEW TAB 2: Native PDF to Excel Converter with Live Coordinates Parsing & Editing -->
+    <main id="pdf-to-excel-demo" class="tab-content">
+        <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div class="web-app-frame-wrapper">
+                <div class="frame-header">
+                    <div class="frame-dots">
+                        <span class="dot dot-r"></span>
+                        <span class="dot dot-y"></span>
+                        <span class="dot dot-g"></span>
+                    </div>
+                    <span class="frame-title">pdf_to_excel_studio_v1.0.html</span>
+                </div>
+                
+                <div class="converter-workspace">
+                    <!-- Left Control Board -->
+                    <div class="converter-left">
+                        <div>
+                            <p style="margin-bottom: 15px; color: #fff; font-weight: 600;">Browser Sandbox parsing</p>
+                            
+                            <div class="converter-upload-box" onclick="document.getElementById('file-input').click()">
+                                <p style="margin: 0; font-weight: 600; color: var(--primary); font-size: 0.85rem;">Click to upload PDF</p>
+                                <p style="margin: 5px 0 0 0; font-size: 0.72rem; color: var(--text-muted);">Secure local browser conversion</p>
+                                <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
+                            </div>
+                            
+                            <p id="status" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-top: 15px;"></p>
+                            <button id="btn-convert" class="conv-btn conv-btn-convert" style="display:none;" onclick="convertToExcel()">Convert & Preview</button>
+
+                            <!-- Modification Clean Tools -->
+                            <div class="conv-tools-section" id="clean-tools" style="display: none;">
+                                <h3 style="font-size: 0.8rem; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Workspace Rules</h3>
+                                <button class="conv-tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Filter Noise Rows</button>
+                                <button class="conv-tool-btn" onclick="cleanDuplicateHeaders()">🧹 Remove Repeating Headers</button>
+                                <button class="conv-tool-btn" onclick="cleanEmptyRows()">🗑️ Delete Empty Rows</button>
+                                <button class="conv-tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Text</button>
+                            </div>
+                        </div>
+
+                        <button id="btn-download" class="conv-btn conv-btn-download" style="display:none;" onclick="downloadExcel()">Download Excel Sheet</button>
+                    </div>
+
+                    <!-- Right Spreadsheet Board -->
+                    <div class="converter-right">
+                        <div class="preview-header-title">
+                            <span>Spreadsheet Canvas</span>
+                            <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
+                        </div>
+                        <div class="preview-container">
+                            <table id="preview-table" contenteditable="true">
+                                <!-- Data elements will construct here -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
+        </div>
+    </main>
+
+    <!-- TAB 3: Free Gmail addon for Bill processing -->
     <main id="bill-demo" class="tab-content">
         <div style="max-width: 800px; margin: 0 auto 30px auto; text-align: center;">
             <p style="font-size: 1.1rem; margin-bottom: 20px;">Automatically extract processing variables from invoice attachments in Gmail and port metadata structures directly to Google Sheets logs.</p>
@@ -242,7 +489,7 @@
         </div>
     </main>
 
-    <!-- TAB 3: NEW APPS SCRIPT WEB APP -->
+    <!-- TAB 4: NEW APPS SCRIPT WEB APP -->
     <main id="new-app-demo" class="tab-content">
         <div class="tab-container-inner" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
             <div class="web-app-frame-wrapper">
@@ -308,7 +555,271 @@
         </div>
     </footer>
 
+    <!-- =========================================================================
+       NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS
+       ========================================================================= -->
     <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        let uploadedFile = null;
+
+        function handleFile(file) {
+            if (!file) return;
+            uploadedFile = file;
+            document.getElementById('status').innerText = `File: ${file.name}`;
+            document.getElementById('btn-convert').style.display = 'block';
+        }
+
+        async function convertToExcel() {
+            if (!uploadedFile) return;
+            document.getElementById('status').innerText = "Processing PDF...";
+            const table = document.getElementById('preview-table');
+            table.innerHTML = ""; // Clear old preview
+
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                
+                try {
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    const allTransactions = [];
+                    let detectedHeaders = null;
+                    let colBounds = [];
+
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        const page = await pdf.getPage(pageNum);
+                        const textContent = await page.getTextContent();
+                        
+                        // Group text items into rows by vertical alignment with a 4px tolerance
+                        const rowsY = [];
+                        textContent.items.forEach(item => {
+                            const y = item.transform[5];
+                            const text = item.str.trim();
+                            if (text === "") return;
+                            
+                            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 4);
+                            if (foundRow) {
+                                foundRow.items.push(item);
+                            } else {
+                                rowsY.push({ y: y, items: [item] });
+                            }
+                        });
+
+                        // Sort rows from top to bottom
+                        rowsY.sort((a, b) => b.y - a.y);
+
+                        // Locate the header row
+                        let headerRow = null;
+                        for (let r of rowsY) {
+                            const rowText = r.items.map(it => it.str.toUpperCase());
+                            const hasDate = rowText.some(t => t.includes("DATE"));
+                            const hasDesc = rowText.some(t => t.includes("DESCRIPTION"));
+                            const hasBal = rowText.some(t => t.includes("BALANCE"));
+                            
+                            if (hasDate && hasDesc && hasBal) {
+                                headerRow = r;
+                                break;
+                            }
+                        }
+
+                        // Calculate boundaries based on X coordinates of headers
+                        if (headerRow && !detectedHeaders) {
+                            const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
+                            detectedHeaders = headerItems.map(it => it.str.trim().toUpperCase());
+                            const headerXs = headerItems.map(it => it.transform[4]);
+                            
+                            colBounds = [];
+                            for (let i = 0; i < headerXs.length - 1; i++) {
+                                colBounds.push((headerXs[i] + headerXs[i+1]) / 2);
+                            }
+                        }
+
+                        if (!detectedHeaders) continue;
+
+                        // Process data rows below header
+                        rowsY.forEach(r => {
+                            if (headerRow && r.y >= headerRow.y) return; 
+
+                            const cells = Array(detectedHeaders.length).fill("");
+                            
+                            r.items.forEach(item => {
+                                const x = item.transform[4];
+                                let colIdx = 0;
+                                while (colIdx < colBounds.length && x > colBounds[colIdx]) {
+                                    colIdx++;
+                                }
+                                cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
+                            });
+
+                            if (cells.some(c => c !== "")) {
+                                allTransactions.push(cells);
+                            }
+                        });
+                    }
+
+                    if (allTransactions.length === 0) {
+                        document.getElementById('status').innerText = "Parsing failed.";
+                        return;
+                    }
+
+                    // Smart Post-Processing: Merge multi-line descriptions
+                    const finalTransactions = [];
+                    allTransactions.forEach(row => {
+                        const hasDate = row[0] !== "";
+                        const hasAmount = row[3] !== "" || row[4] !== "" || row[5] !== "";
+                        const descriptionValue = row[1];
+
+                        if (!hasDate && !hasAmount && descriptionValue !== "") {
+                            if (finalTransactions.length > 0) {
+                                const lastRow = finalTransactions[finalTransactions.length - 1];
+                                lastRow[1] = (lastRow[1] + " " + descriptionValue).trim();
+                            }
+                        } else {
+                            finalTransactions.push(row);
+                        }
+                    });
+
+                    // Build Interactive HTML Table UI
+                    // 1. Build Header Row (Add extra Action column at the end)
+                    const trHeader = document.createElement('tr');
+                    detectedHeaders.forEach(headerText => {
+                        const th = document.createElement('th');
+                        th.innerText = headerText;
+                        trHeader.appendChild(th);
+                    });
+                    const thAction = document.createElement('th');
+                    thAction.innerText = "ACTIONS";
+                    thAction.className = "action-col no-export"; // Ignore on export
+                    trHeader.appendChild(thAction);
+                    table.appendChild(trHeader);
+
+                    // 2. Build Data Rows (Add individual delete buttons)
+                    finalTransactions.forEach(row => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cellText => {
+                            const td = document.createElement('td');
+                            td.innerText = cellText;
+                            tr.appendChild(td);
+                        });
+                        
+                        // Add Delete Action Cell
+                        const tdAction = document.createElement('td');
+                        tdAction.className = "no-export";
+                        tdAction.contentEditable = "false"; // Disable cell editing on delete button
+                        tdAction.innerHTML = `<button class="btn-row-delete" onclick="this.closest('tr').remove()">×</button>`;
+                        tr.appendChild(tdAction);
+
+                        table.appendChild(tr);
+                    });
+
+                    document.getElementById('status').innerText = "Conversion ready! Review on the right.";
+                    document.getElementById('clean-tools').style.display = 'block';
+                    document.getElementById('btn-download').style.display = 'block';
+
+                } catch (error) {
+                    console.error(error);
+                    document.getElementById('status').innerText = "Parsing error.";
+                }
+            };
+            reader.readAsArrayBuffer(uploadedFile);
+        }
+
+        /* =========================================================================
+           SMART CLEAN-UP TOOLS
+           ========================================================================= */
+
+        function autoDeleteNonTransactions() {
+            const rows = document.querySelectorAll('#preview-table tr');
+            if (rows.length <= 1) return;
+
+            // Matches formats: DD-MM-YYYY, DD/MM/YYYY, D-M-YY, etc.
+            const dateRegex = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}$/;
+            let removedCount = 0;
+
+            rows.forEach((row, index) => {
+                if (index === 0) return; // Save main headers
+
+                const dateCell = row.querySelector('td');
+                if (dateCell) {
+                    const cellText = dateCell.innerText.trim();
+                    
+                    if (!dateRegex.test(cellText)) {
+                        row.remove();
+                        removedCount++;
+                    }
+                }
+            });
+            alert(`⚡ Smart Filter complete! Auto-deleted ${removedCount} metadata & footer rows.`);
+        }
+
+        function cleanDuplicateHeaders() {
+            const rows = Array.from(document.querySelectorAll('#preview-table tr'));
+            if (rows.length <= 1) return;
+
+            const headerText = Array.from(rows[0].querySelectorAll('th')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+            let removedCount = 0;
+
+            for (let i = 1; i < rows.length; i++) {
+                const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+                if (rowText === headerText) {
+                    rows[i].remove();
+                    removedCount++;
+                }
+            }
+            alert(`Cleaned up ${removedCount} repeating header rows.`);
+        }
+
+        function cleanEmptyRows() {
+            const rows = document.querySelectorAll('#preview-table tr');
+            let removedCount = 0;
+            rows.forEach((row, index) => {
+                if (index === 0) return;
+                if (row.innerText.trim() === "") {
+                    row.remove();
+                    removedCount++;
+                }
+            });
+            alert(`Deleted ${removedCount} empty rows.`);
+        }
+
+        function promptDeleteRowByText() {
+            const filterText = prompt("Enter specific text to delete matching rows:");
+            if (!filterText) return;
+
+            const lowerFilter = filterText.toLowerCase().trim();
+            const rows = document.querySelectorAll('#preview-table tr');
+            let removedCount = 0;
+
+            rows.forEach((row, index) => {
+                if (index === 0) return;
+                if (row.innerText.toLowerCase().includes(lowerFilter)) {
+                    row.remove();
+                    removedCount++;
+                }
+            });
+            alert(`Deleted ${removedCount} rows matching "${filterText}".`);
+        }
+
+        function downloadExcel() {
+            const table = document.getElementById('preview-table');
+            if (table.rows.length === 0) return;
+
+            // 1. Temporarily hide all columns marked as 'no-export'
+            const noExportElements = document.querySelectorAll('.no-export');
+            noExportElements.forEach(el => el.style.display = 'none');
+
+            // 2. Compile table to SheetJS
+            const workbook = XLSX.utils.table_to_book(table);
+
+            // 3. Immediately restore the visibility of the elements back in the browser
+            noExportElements.forEach(el => el.style.display = '');
+
+            XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
+        }
+
+        /* =========================================================================
+           TAB CONTROLLER SCRIPT
+           ========================================================================= */
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
