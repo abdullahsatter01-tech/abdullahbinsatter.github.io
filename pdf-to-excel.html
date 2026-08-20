@@ -369,6 +369,9 @@
     <!-- =========================================================================
        NATIVE PARSING & SPREADSHEET LOGIC SCRIPT
        ========================================================================= -->
+    <!-- =========================================================================
+       NATIVE PARSING & SPREADSHEET LOGIC SCRIPT (TESTED FOR BMO WEBPAGE PDFS)
+       ========================================================================= -->
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
@@ -383,29 +386,22 @@
             document.getElementById('btn-convert').style.display = 'block';
         }
 
-        // Date detection supporting Month DD, YYYY (Aug 10, 2026) and numeric (08/10/2026, 10-08-2026)
-        function startsWithDate(str) {
-            if (!str) return false;
-            const t = str.trim();
-            const alphaMatch = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}(,)?\s*(\d{2,4})?/i;
-            const numMatch = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}/;
-            return alphaMatch.test(t) || numMatch.test(t);
-        }
+        // Recognizes bank transaction dates (Aug 10, 2026 / Jul 31, 2026 / 08/10/2026 / 10-08-2026)
+        function parseDateString(str) {
+            if (!str) return null;
+            const clean = str.replace(/[↓↑]/g, '').trim();
+            
+            // Match "Aug 10, 2026" or "Jul 31, 2026"
+            const alphaMatch = clean.match(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}/i);
+            if (alphaMatch) return alphaMatch[0];
 
-        function isDateToken(str) {
-            if (!str) return false;
-            const t = str.trim();
-            return /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*$/i.test(t) || 
-                   /^\d{1,2},?$/.test(t) || 
-                   /^\d{4}$/.test(t) || 
-                   startsWithDate(t);
-        }
+            // Match numeric dates (excluding timestamps with times/AM/PM)
+            if (!clean.includes(":") && !/AM|PM/i.test(clean)) {
+                const numMatch = clean.match(/^(\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4})/);
+                if (numMatch) return numMatch[0];
+            }
 
-        // Currency matcher (+ $536.65, - $35.83, $11,380.01, $25.00, etc.)
-        function isMoney(str) {
-            if (!str) return false;
-            const t = str.trim();
-            return /^([+-]?\s*\$?\s*[\d,]+\.\d{2})$/.test(t) || /^\$?\d{1,3}(,\d{3})*(\.\d{2})?$/.test(t);
+            return null;
         }
 
         async function convertToExcel() {
@@ -426,112 +422,129 @@
                         const page = await pdf.getPage(pageNum);
                         const textContent = await page.getTextContent();
                         
-                        // Cluster text elements by vertical line (tolerance 5.5px)
-                        const lines = [];
+                        // Collect all raw text items on this page
+                        const rawItems = [];
                         textContent.items.forEach(item => {
-                            const y = item.transform[5];
-                            const x = item.transform[4];
                             let text = item.str.replace(/[↓↑]/g, '').trim();
                             if (!text) return;
-
-                            // Skip print header/footer noise
+                            
+                            // Ignore browser printout headers, URLs, and pagination widgets
                             if (text.includes("http://") || text.includes("https://") || text.includes("Account overview") || text.includes("Items per page")) return;
                             if (/^\d+\/\d+$/.test(text) || text.includes("of 104") || text === "Previous" || text === "Next" || text === "DOWNLOAD") return;
                             if (text.includes("Showing:") || text.includes("All transactions") || text.includes("TRANSFER") || text.includes("PAY BILL") || text.includes("INTERAC")) return;
+                            if (/^\d{1,2}\/\d{1,2}\/\d{2,4},\s*\d{1,2}:\d{2}/.test(text)) return; // Exclude browser print timestamp
 
-                            let foundLine = lines.find(l => Math.abs(l.y - y) < 5.5);
-                            if (foundLine) {
-                                foundLine.items.push({ text, x });
-                            } else {
-                                lines.push({ y, items: [{ text, x }] });
-                            }
+                            rawItems.push({
+                                text: text,
+                                x: item.transform[4],
+                                y: item.transform[5]
+                            });
                         });
 
-                        // Sort lines from top to bottom
-                        lines.sort((a, b) => b.y - a.y);
+                        // Step 1: Pre-sort items top to bottom
+                        rawItems.sort((a, b) => b.y - a.y || a.x - b.x);
 
-                        lines.forEach(line => {
-                            // Sort words in line from left to right
-                            line.items.sort((a, b) => a.x - b.x);
-
-                            const fullText = line.items.map(i => i.text).join(" ");
+                        // Step 2: Assemble multi-fragment tokens on the same horizontal line
+                        // (e.g. "Aug" + "10," + "2026" or "+" + "$536.65")
+                        const pageDateAnchors = [];
+                        
+                        for (let i = 0; i < rawItems.length; i++) {
+                            const item = rawItems[i];
                             
-                            // Skip header lines
-                            if (fullText.toUpperCase().includes("DATE") && fullText.toUpperCase().includes("BALANCE")) return;
-                            if (fullText.includes("Current balance") || fullText.includes("Available balance") || fullText.includes("Other 1 NEW")) return;
-
-                            // Check if this line starts with a transaction date
-                            const firstItemsText = line.items.slice(0, 3).map(i => i.text).join(" ");
-                            if (startsWithDate(firstItemsText)) {
-                                let dateTokens = [];
-                                let remainingItems = [];
-                                let dateDone = false;
-
-                                // Group the date tokens (e.g. "Aug" + "10," + "2026")
-                                line.items.forEach((it, idx) => {
-                                    if (!dateDone && (idx < 3) && isDateToken(it.text)) {
-                                        dateTokens.push(it.text);
-                                    } else {
-                                        dateDone = true;
-                                        remainingItems.push(it);
-                                    }
-                                });
-
-                                const rowDate = dateTokens.join(" ");
-
-                                // Extract balance and transaction amounts from remaining items
-                                let rowDesc = "";
-                                let rowMoneyOut = "";
-                                let rowMoneyIn = "";
-                                let rowBalance = "";
-
-                                // Find all currency tokens from the right side of the line
-                                const moneyTokens = [];
-                                const descTokens = [];
-
-                                remainingItems.forEach(it => {
-                                    if (isMoney(it.text) || it.text.includes("$") || /^[+-]\s*\$?\d+/.test(it.text)) {
-                                        moneyTokens.push(it.text);
-                                    } else {
-                                        descTokens.push(it.text);
-                                    }
-                                });
-
-                                rowDesc = descTokens.join(" ").trim();
-
-                                if (moneyTokens.length >= 2) {
-                                    const txnAmount = moneyTokens[0];
-                                    rowBalance = moneyTokens[moneyTokens.length - 1];
-
-                                    if (txnAmount.includes("-")) {
-                                        rowMoneyOut = txnAmount;
-                                    } else if (txnAmount.includes("+")) {
-                                        rowMoneyIn = txnAmount;
-                                    } else {
-                                        // Default positioning
-                                        rowMoneyIn = txnAmount;
-                                    }
-                                } else if (moneyTokens.length === 1) {
-                                    rowBalance = moneyTokens[0];
-                                }
-
-                                finalTransactions.push([rowDate, rowDesc, rowMoneyOut, rowMoneyIn, rowBalance]);
-                            } else if (finalTransactions.length > 0 && fullText) {
-                                // Multi-line description wrap
-                                if (!isMoney(fullText)) {
-                                    const prev = finalTransactions[finalTransactions.length - 1];
-                                    prev[1] = (prev[1] + " " + fullText).trim();
+                            // Look ahead up to 3 tokens to construct a date
+                            const candidates = [item.text];
+                            for (let j = 1; j <= 3 && (i + j) < rawItems.length; j++) {
+                                if (Math.abs(rawItems[i + j].y - item.y) < 5) {
+                                    candidates.push(rawItems[i + j].text);
                                 }
                             }
+
+                            const combinedDateText = candidates.join(" ");
+                            const matchedDate = parseDateString(combinedDateText);
+
+                            if (matchedDate && item.x < 150) {
+                                pageDateAnchors.push({
+                                    date: matchedDate,
+                                    y: item.y,
+                                    x: item.x
+                                });
+                            }
+                        }
+
+                        // Step 3: For each Date anchor, gather all row elements within +/- 14px
+                        pageDateAnchors.forEach((anchor, aIdx) => {
+                            // Find upper and lower boundary for this row
+                            const nextAnchorY = (aIdx + 1 < pageDateAnchors.length) ? pageDateAnchors[aIdx + 1].y : (anchor.y - 40);
+                            const prevAnchorY = (aIdx > 0) ? pageDateAnchors[aIdx - 1].y : (anchor.y + 40);
+
+                            const rowTop = anchor.y + Math.min(14, (prevAnchorY - anchor.y) / 2);
+                            const rowBottom = anchor.y - Math.min(14, (anchor.y - nextAnchorY) / 2);
+
+                            // Collect all items within this transaction row's vertical window
+                            const rowItems = rawItems.filter(it => it.y <= (rowTop + 1) && it.y >= (rowBottom - 1));
+                            rowItems.sort((a, b) => a.x - b.x);
+
+                            // Extract Date, Amounts, and Description
+                            let rowDescTokens = [];
+                            let rowMoneyTokens = [];
+
+                            rowItems.forEach(it => {
+                                // Skip the date tokens on the far left
+                                if (it.x < 130 && parseDateString(it.text)) return;
+                                if (it.text.toLowerCase() === "date" || it.text.toLowerCase() === "balance") return;
+
+                                // Currency / Amount pattern matching
+                                if (it.text.includes("$") || /^[+-]?\s*[\d,]+\.\d{2}$/.test(it.text) || it.text === "+" || it.text === "-") {
+                                    rowMoneyTokens.push(it.text);
+                                } else {
+                                    rowDescTokens.push(it.text);
+                                }
+                            });
+
+                            // Reconstruct amounts
+                            // Combine split signs: e.g. ["+", "$536.65"] -> "+ $536.65"
+                            const cleanMoney = [];
+                            for (let m = 0; m < rowMoneyTokens.length; m++) {
+                                let curr = rowMoneyTokens[m];
+                                if ((curr === "+" || curr === "-") && (m + 1 < rowMoneyTokens.length)) {
+                                    cleanMoney.push(curr + " " + rowMoneyTokens[m + 1]);
+                                    m++;
+                                } else {
+                                    cleanMoney.push(curr);
+                                }
+                            }
+
+                            let rowMoneyOut = "";
+                            let rowMoneyIn = "";
+                            let rowBalance = "";
+
+                            if (cleanMoney.length >= 2) {
+                                // Last amount is Balance
+                                rowBalance = cleanMoney[cleanMoney.length - 1];
+                                
+                                // Second to last is the transaction amount
+                                const txnAmount = cleanMoney[cleanMoney.length - 2];
+                                if (txnAmount.includes("-")) {
+                                    rowMoneyOut = txnAmount;
+                                } else {
+                                    rowMoneyIn = txnAmount;
+                                }
+                            } else if (cleanMoney.length === 1) {
+                                rowBalance = cleanMoney[0];
+                            }
+
+                            const rowDesc = rowDescTokens.join(" ").replace(/\s+/g, ' ').trim();
+
+                            finalTransactions.push([anchor.date, rowDesc, rowMoneyOut, rowMoneyIn, rowBalance]);
                         });
                     }
 
                     if (finalTransactions.length === 0) {
-                        document.getElementById('status').innerText = "Parsing failed. Check statement format.";
+                        document.getElementById('status').innerText = "Parsing failed. 0 transactions found.";
                         return;
                     }
 
-                    // Build spreadsheet table DOM
+                    // Render Final Spreadsheet Table
                     const headers = ["DATE", "DESCRIPTION", "MONEY OUT", "MONEY IN", "BALANCE"];
                     const trHeader = document.createElement('tr');
                     headers.forEach((headerText, colIdx) => {
@@ -578,15 +591,12 @@
 
                 } catch (error) {
                     console.error(error);
-                    document.getElementById('status').innerText = "Parsing error.";
+                    document.getElementById('status').innerText = "Parsing error: " + error.message;
                 }
             };
             reader.readAsArrayBuffer(uploadedFile);
         }
 
-        /* =========================================================================
-           SMART AUTO-RECALCULATION ENGINE
-           ========================================================================= */
         function recalculateBalances() {
             const table = document.getElementById('preview-table');
             const rows = Array.from(table.rows);
@@ -669,14 +679,14 @@
             rows.forEach((row, index) => {
                 if (index === 0) return;
                 const dateCell = row.querySelector('td');
-                if (dateCell && !startsWithDate(dateCell.innerText.trim())) {
+                if (dateCell && !parseDateString(dateCell.innerText.trim())) {
                     row.remove();
                     removedCount++;
                 }
             });
             
             recalculateBalances();
-            alert(`⚡ Filter complete! Auto-deleted ${removedCount} noise rows.`);
+            alert(`⚡ Filter complete! Auto-deleted ${removedCount} rows.`);
         }
 
         function cleanDuplicateHeaders() {
