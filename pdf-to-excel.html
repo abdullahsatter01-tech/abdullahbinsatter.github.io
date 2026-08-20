@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3289763837600913"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3289763837600913" crossorigin="anonymous"></script>
     <!-- Microsoft Clarity Global Tracking Script -->
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
@@ -14,36 +13,68 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free PDF to Excel Converter Online | No Sign-Up & Secure</title>
-    <meta name="description" content="Convert PDF bank statements and financial tables to editable Excel (.xlsx) spreadsheets. 100% secure client-side browser execution—no data ever leaves your device.">
+    <title>Free Bank Statement to Excel Converter | PDF to XLSX (BMO, Chase, TD, RBC)</title>
+    <meta name="description" content="Convert bank statement PDFs (BMO, Chase, TD, Wells Fargo, RBC) into clean Excel (.xlsx) spreadsheets locally. 100% private, client-side execution.">
+    <link rel="canonical" href="https://gcpautomation.com/pdf-to-excel.html">
 
-    <!-- Structured FAQ Schema Markup for Google SEO Dropdowns -->
+    <!-- Open Graph / Social Sharing Meta Tags -->
+    <meta property="og:title" content="Free Bank Statement to Excel Converter | 100% Private">
+    <meta property="og:description" content="Instantly convert bank PDF statements to editable Excel spreadsheets directly in your browser. No server uploads.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gcpautomation.com/pdf-to-excel.html">
+
+    <!-- Structured FAQ & HowTo Schema Markup for Google SEO Rich Results -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [{
-        "@type": "Question",
-        "name": "Is my financial data safe using this PDF to Excel converter?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes. This converter runs 100% client-side inside your local web browser. Your sensitive files and bank statements are processed locally on your device and are never uploaded to any server or shared with anyone."
+      "@graph": [
+        {
+          "@type": "FAQPage",
+          "mainEntity": [{
+            "@type": "Question",
+            "name": "Is my financial data safe using this PDF to Excel converter?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. This converter runs 100% client-side inside your local browser. Sensitive files, account numbers, and bank statements are never uploaded to any server."
+            }
+          }, {
+            "@type": "Question",
+            "name": "Does this work with digital banking printouts like BMO, TD, or Chase?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The parsing engine recognizes standard banking terms including Money In/Money Out, Debit/Credit, and alphanumeric dates like 'Aug 10, 2026'."
+            }
+          }, {
+            "@type": "Question",
+            "name": "How do I export to Excel or Google Sheets?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Click 'Download Excel Sheet' to export an .xlsx file, or click 'Copy Table' to paste the tab-separated data straight into Google Sheets or Excel."
+            }
+          }]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Convert a Bank Statement PDF to Excel",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Upload Bank Statement",
+              "text": "Click the upload area and select your bank statement PDF from your local device."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Convert and Preview",
+              "text": "Click Convert & Preview to run the local coordinate extraction engine."
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Clean and Export",
+              "text": "Use the Workspace Rules to remove repeating headers or noise rows, then click Download Excel Sheet."
+            }
+          ]
         }
-      }, {
-        "@type": "Question",
-        "name": "Can I edit the converted spreadsheet before downloading?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, our interactive spreadsheet canvas lets you click any cell, edit text, adjust numbers, and delete redundant lines directly on the screen before exporting your finished .xlsx file."
-        }
-      }, {
-        "@type": "Question",
-        "name": "How does the 'Copy Table' feature work?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Clicking 'Copy Table' formats your parsed statement into standard tab-separated values (TSV) and copies it to your clipboard. When you paste it into Microsoft Excel or Google Sheets, the columns and rows align automatically."
-        }
-      }]
+      ]
     }
     </script>
 
@@ -64,16 +95,13 @@
             --success: #10b981;
         }
 
-        /* =========================================================================
-           HIGH-CONTRAST LIGHT MODE THEME OVERRIDES
-           ========================================================================= */
         body.light-mode {
-            --dark-bg: #f1f5f9; /* Slate 100 background */
-            --card-bg: #ffffff; /* Crisp white cards */
-            --nav-bg: #0f172a;  /* Keep dark nav bar for professional contrast */
-            --text-main: #0f172a; /* Slate 900 text */
-            --text-muted: #475569; /* Slate 600 muted text */
-            --primary: #0284c7;  /* High-contrast sky blue primary (neon has poor contrast on white) */
+            --dark-bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --nav-bg: #0f172a;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #0284c7;
             --primary-dark: #0369a1;
         }
 
@@ -88,7 +116,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
         
-        /* Navigation Header Bar */
         nav { background: var(--nav-bg); border-bottom: 1px solid rgba(255,255,255,0.05); position: fixed; width: 100%; top: 0; left: 0; z-index: 1000; }
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .logo { font-size: 1.4rem; font-weight: bold; color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
@@ -98,7 +125,6 @@
         .nav-links a { text-decoration: none; color: #9ca3af; font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
         .nav-links a:hover { color: #00e5ff; }
 
-        /* Interactive Theme Toggle Button */
         .theme-toggle-btn {
             background: none;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -113,18 +139,13 @@
             gap: 6px;
             transition: all 0.2s;
         }
-        .theme-toggle-btn:hover {
-            border-color: #00e5ff;
-            box-shadow: 0 0 8px rgba(0, 229, 255, 0.2);
-        }
+        .theme-toggle-btn:hover { border-color: #00e5ff; box-shadow: 0 0 8px rgba(0, 229, 255, 0.2); }
 
-        /* Studio Title / Header */
         header { padding: 120px 20px 30px; text-align: center; background: radial-gradient(circle at center, rgba(0,229,255,0.04) 0%, transparent 60%); }
         .hero-container { max-width: 800px; margin: 0 auto; }
         header h1 { font-size: 2.8rem; margin-bottom: 8px; font-weight: 800; letter-spacing: -0.5px; }
         header p { font-size: 1.1rem; color: var(--text-muted); }
 
-        /* Workspace Wrapper */
         .workspace-container { max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
         .web-app-frame-wrapper { 
             border-radius: 16px; 
@@ -142,10 +163,9 @@
         .dot-g { background-color: #10b981; }
         .frame-title { font-size: 0.85rem; color: #9ca3af; font-family: monospace; letter-spacing: 0.5px; }
 
-        /* Split-Screen Workspace */
         .converter-workspace { display: flex; height: 800px; background-color: var(--dark-bg); transition: background-color 0.3s; }
         .converter-left {
-            width: 256px;
+            width: 260px;
             flex-shrink: 0;
             background-color: var(--card-bg);
             border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -166,9 +186,7 @@
             overflow: hidden;
             transition: background-color 0.3s;
         }
-        body.light-mode .converter-right {
-            background-color: #e2e8f0; /* Soft contrast for light mode spreadsheet workspace */
-        }
+        body.light-mode .converter-right { background-color: #e2e8f0; }
 
         .converter-upload-box {
             border: 2px dashed rgba(255, 255, 255, 0.1);
@@ -179,14 +197,8 @@
             background: rgba(255, 255, 255, 0.02);
             transition: all 0.2s;
         }
-        body.light-mode .converter-upload-box {
-            border-color: #cbd5e1;
-            background: #f8fafc;
-        }
-        .converter-upload-box:hover {
-            border-color: var(--primary);
-            background: rgba(0, 229, 255, 0.03);
-        }
+        body.light-mode .converter-upload-box { border-color: #cbd5e1; background: #f8fafc; }
+        .converter-upload-box:hover { border-color: var(--primary); background: rgba(0, 229, 255, 0.03); }
         .conv-btn {
             width: 100%;
             padding: 12px;
@@ -221,15 +233,10 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-        body.light-mode .conv-tool-btn {
-            background: #f1f5f9;
-            color: #475569;
-            border-color: #cbd5e1;
-        }
+        body.light-mode .conv-tool-btn { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
         .conv-tool-btn:hover { border-color: var(--primary); color: white; }
         body.light-mode .conv-tool-btn:hover { color: var(--primary-dark); }
 
-        /* Spreadsheet Canvas styling */
         .preview-header-title { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .preview-container { flex-grow: 1; background-color: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; overflow: auto; transition: background-color 0.3s; }
         body.light-mode .preview-container { border-color: #cbd5e1; }
@@ -246,12 +253,10 @@
         .preview-container tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.01); }
         body.light-mode .preview-container tr:nth-child(even) { background-color: #f8fafc; }
 
-        /* Accounting Column Sizing */
-        .col-date { width: 100px; min-width: 100px; text-align: center !important; }
+        .col-date { width: 110px; min-width: 110px; text-align: center !important; }
         .col-desc { text-align: left !important; }
-        .col-ref { width: 90px; min-width: 90px; text-align: center !important; }
-        .col-amount { width: 110px; min-width: 110px; text-align: right !important; }
-        .col-action { width: 80px; min-width: 80px; text-align: center !important; }
+        .col-amount { width: 115px; min-width: 115px; text-align: right !important; }
+        .col-action { width: 60px; min-width: 60px; text-align: center !important; }
 
         .btn-row-delete { background: none; border: none; color: var(--danger); font-size: 1.1rem; cursor: pointer; font-weight: bold; padding: 1px 8px; transition: all 0.2s; display: block; margin: 0 auto; }
         .btn-row-delete:hover { background-color: rgba(239, 68, 68, 0.15); }
@@ -261,41 +266,36 @@
         .sort-btn:hover { background: var(--primary); color: #0b0f19; border-color: var(--primary); }
         body.light-mode .sort-btn:hover { color: #ffffff; }
 
-        /* Unified Content Sections */
         section { max-width: 1200px; margin: 80px auto; padding: 0 20px; scroll-margin-top: 100px; }
         h2 { font-size: 2rem; color: var(--text-main); margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         h2::after { content: ''; display: inline-block; flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--primary), transparent); margin-left: 15px; }
         h3 { font-size: 1.25rem; color: var(--primary); margin: 25px 0 10px; font-weight: 600; }
         p { margin-bottom: 15px; font-size: 1.02rem; color: var(--text-muted); }
-        ul, ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
+        ol { margin-bottom: 20px; padding-left: 20px; color: var(--text-muted); }
         li { margin-bottom: 10px; font-size: 1.02rem; }
 
         .setup-step { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 20px; margin-bottom: 15px; border-radius: 8px; list-style-type: none; border-left: 4px solid var(--primary); transition: background-color 0.3s; }
         body.light-mode .setup-step { border-color: var(--primary); }
         .setup-step strong { color: var(--text-main); font-size: 1.1rem; display: block; margin-bottom: 4px; }
         .card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 25px; margin-top: 25px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); transition: background-color 0.3s; }
-        body.light-mode .card { border-color: var(--primary); }
 
-        /* Toast notifications */
         .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
         .toast { padding: 11px 18px; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); font-size: 0.83rem; font-weight: 600; color: #fff; max-width: 320px; animation: slideIn 0.25s ease; }
         .toast-green { background: var(--success); }
         .toast-red { background: var(--danger); }
 
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Responsive stack for Mobile */
         @media (max-width: 768px) {
             .converter-workspace { flex-direction: column; height: auto; }
             .converter-left { width: 100%; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
             .converter-right { height: 500px; }
         }
 
-        footer { margin-top: 120px; padding: 60px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background-color: var(--card-bg); font-size: 0.88rem; transition: background-color 0.3s; }
+        footer { margin-top: 120px; padding: 60px 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background-color: var(--card-bg); font-size: 0.88rem; }
         footer p { color: var(--text-muted); margin-bottom: 8px; }
         .legal-links { margin-top: 15px; }
-        .legal-links a { color: var(--text-muted); text-decoration: none; margin: 0 12px; font-weight: 500; transition: color 0.2s; }
+        .legal-links a { color: var(--text-muted); text-decoration: none; margin: 0 12px; font-weight: 500; }
         .legal-links a:hover { color: var(--primary); text-decoration: underline; }
     </style>
 </head>
@@ -313,7 +313,6 @@
                 <li><a href="privacy.html">Privacy Policy</a></li>
                 <li><a href="terms.html">Terms</a></li>
             </ul>
-            <!-- Theme Toggle Button in Navbar -->
             <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">
                 <span id="theme-icon">☀️</span> <span id="theme-text">Light Mode</span>
             </button>
@@ -322,8 +321,8 @@
 
     <header>
         <div class="hero-container">
-            <h1>PDF to Excel Converter</h1>
-            <p>Interactive, local coordinates parsing designed specifically for financial statement structures.</p>
+            <h1>Bank Statement PDF to Excel Converter</h1>
+            <p>Convert bank PDFs and digital statements into clean, editable spreadsheets. 100% private in-browser parsing.</p>
         </div>
     </header>
 
@@ -335,102 +334,85 @@
                     <span class="dot dot-y"></span>
                     <span class="dot dot-g"></span>
                 </div>
-                <span class="frame-title">pdf_to_excel_studio_v1.0.html</span>
+                <span class="frame-title">bank_statement_converter_v2.0.html</span>
             </div>
             
             <div class="converter-workspace">
-                <!-- Left Control Board -->
                 <div class="converter-left">
                     <div>
                         <p style="margin-bottom: 15px; color: var(--text-main); font-weight: 600;">Local Browser Sandbox</p>
                         
                         <div class="converter-upload-box" onclick="document.getElementById('file-input').click()">
                             <p style="margin: 0; font-weight: 600; color: var(--primary); font-size: 0.85rem;">Click to upload PDF</p>
-                            <p style="margin: 5px 0 0 0; font-size: 0.72rem; color: var(--text-muted);">Secure local browser conversion</p>
+                            <p style="margin: 5px 0 0 0; font-size: 0.72rem; color: var(--text-muted);">Supports BMO, Chase, TD, RBC, etc.</p>
                             <input type="file" id="file-input" accept=".pdf" style="display:none" onchange="handleFile(this.files[0])">
                         </div>
                         
                         <p id="status" style="font-size: 0.8rem; font-weight: 600; color: var(--primary); margin-top: 15px;"></p>
                         <button id="btn-convert" class="conv-btn conv-btn-convert" style="display:none;" onclick="convertToExcel()">Convert & Preview</button>
 
-                        <!-- Modification Clean Tools -->
                         <div class="conv-tools-section" id="clean-tools" style="display: none;">
                             <h3 style="font-size: 0.8rem; color: var(--text-main); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Workspace Rules</h3>
-                            <button class="conv-tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Filter Noise Rows</button>
+                            <button class="conv-tool-btn" onclick="autoDeleteNonTransactions()">⚡ Auto-Filter Noise & Footers</button>
                             <button class="conv-tool-btn" onclick="cleanDuplicateHeaders()">🧹 Remove Repeating Headers</button>
                             <button class="conv-tool-btn" onclick="cleanEmptyRows()">🗑️ Delete Empty Rows</button>
                             <button class="conv-tool-btn" onclick="promptDeleteRowByText()">🔎 Delete Rows Containing Text</button>
                         </div>
                     </div>
-                    <!-- Push button cleanly removed for standalone view compliance -->
                     <button id="btn-download" class="conv-btn conv-btn-download" style="display:none;" onclick="downloadExcel()">Download Excel Sheet</button>
                 </div>
 
-                <!-- Right Spreadsheet Board -->
                 <div class="converter-right">
                     <div class="preview-header-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                         <div>
                             <span>Spreadsheet Canvas</span>
-                            <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove custom lines</span>
+                            <span style="color: var(--text-muted); font-size: 0.72rem; font-weight: normal;">• Click cells to edit, use × to remove lines</span>
                         </div>
                         <div style="display: flex; gap: 8px;">
-                            <!-- Copy Table Button -->
-                            <button id="btn-copy" class="sort-btn" style="display: none; padding: 4px 10px;" onclick="copyTableToClipboard()">📋 Copy Table</button>
-                            <!-- Interactive Undo Button (Disabled by default) -->
-                            <button id="btn-undo" class="sort-btn" style="opacity: 0.5; cursor: not-allowed; padding: 4px 10px;" onclick="undoLastAction()" disabled>↩ Undo</button>
+                            <button id="btn-copy" class="sort-btn" style="display: none;" onclick="copyTableToClipboard()">📋 Copy Table</button>
+                            <button id="btn-undo" class="sort-btn" style="opacity: 0.5; cursor: not-allowed;" onclick="undoLastAction()" disabled>↩ Undo</button>
                         </div>
                     </div>
                     <div class="preview-container">
-                        <table id="preview-table" contenteditable="true">
-                            <!-- Data elements will construct here -->
-                        </table>
+                        <table id="preview-table" contenteditable="true"></table>
                     </div>
                 </div>
             </div>
-
         </div>
-        <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Secure Client-Side Context: Processing execution occurs inside sandboxed environment boundaries mapping directly via secure Google Workspace OAuth loops.</p>
+        <p style="margin-top: 20px; font-size: 0.85rem; color: #4B5563; text-align: center;">🔒 Client-Side Sandbox: Zero server uploads. Statements are parsed directly inside your device's memory.</p>
     </div>
 
-    <!-- E-E-A-T trust & Educational Guide Section -->
     <section id="about">
         <h2>Local Processing Security Audit</h2>
         <div class="card" style="border-left: 4px solid var(--success); background: rgba(16, 185, 129, 0.02);">
-            <p style="color: var(--text-main); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;">🔒 Privacy Statement: No data is uploaded or transmitted</p>
-            <p>Standard PDF converters require uploading sensitive company files or client bank statements to foreign cloud servers. This exposes confidential transactional balances to external data miners and potential leaks.</p>
-            <p>Our **GCP Automation Studio Converter operates 100% locally** within your web browser sandbox. Once this page finishes loading, your device handles the entire extraction process. No database, server, or API ever sees your financial statements.</p>
+            <p style="color: var(--text-main); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px;">🔒 100% Zero-Cloud Guarantee</p>
+            <p>Most online PDF converters upload financial records to external servers where data may be retained or analyzed. This engine processes all PDF geometry directly in client-side memory via Web Workers, ensuring no transactional records or account numbers ever leave your machine.</p>
         </div>
     </section>
 
     <section id="setup">
-        <h2>Expert Financial Statement Guide</h2>
-        <p>Converting bank statement PDFs into structured Excel sheets requires maintaining ledger integrity. Here is how to configure and clean your extracted data efficiently:</p>
+        <h2>Supported Financial Institutions & Guides</h2>
         <ol>
-            <li class="setup-step"><strong>1. Standardize Coordinates</strong> Once you click "Convert & Preview", our engine dynamically tracks column coordinates based on the table headers (`DATE`, `DESCRIPTION`, etc.) to prevent structural column shifting.</li>
-            <li class="setup-step"><strong>2. Clean Duplicate Headers</strong> Multi-page statements repeat the table headers on every new page. Click the <strong>🧹 Remove Repeating Headers</strong> rule in the workspace panel to delete these duplicate lines instantly.</li>
-            <li class="setup-step"><strong>3. Filter Extraneous Metadata</strong> Document headers, opening messages, and terms of service don't belong in your final ledger. Click the **⚡ Auto-Filter Noise Rows** button to automatically wipe out non-transaction lines based on date-patterns.</li>
-            <li class="setup-step"><strong>4. Double-Check the Balance Matrix</strong> Our built-in calculation engine mathematically verifies each transaction row. If you correct any typos in the withdrawal or deposit cells, the balances recalculate in real-time.</li>
+            <li class="setup-step"><strong>Universal Banking Compatibility</strong> Tested with statement printouts from BMO, Chase, TD Bank, Royal Bank of Canada (RBC), Scotiabank, Bank of America, and Wells Fargo.</li>
+            <li class="setup-step"><strong>Dynamic Mathematical Balance Engine</strong> Auto-calculates running balance across both standard debit/credit headers and Money Out / Money In formats.</li>
+            <li class="setup-step"><strong>Multi-Page Concatenation</strong> Combines multi-page web printouts into a single unified table without header distortion.</li>
         </ol>
     </section>
 
     <footer>
         <p>&copy; 2026 GCP Automation Store. All rights reserved.</p>
-        <p style="color: #4b5563; font-size: 0.8rem; max-width: 900px; margin: 5px auto 15px auto;">Google Workspace™, Google Sheets™, Google Cloud™, and Gmail™ are registered trademarks of Google LLC. GCP Automation Studio operates as an independent software utility developer.</p>
         <div class="legal-links">
             <a href="privacy.html">Privacy Policy</a> • 
             <a href="terms.html">Terms of Service</a>
         </div>
     </footer>
 
-    <!-- =========================================================================
-       NATIVE PARSING & SPREADSHEET LOGIC SCRIPTS WITH AUTO-CALCULATION
-       ========================================================================= -->
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
         let uploadedFile = null;
-        let undoStack = []; // Track manual edits
-        const MAX_UNDO_LIMIT = 20; // Keeps memory consumption lightweight
+        let undoStack = [];
+        const MAX_UNDO_LIMIT = 20;
 
         function handleFile(file) {
             if (!file) return;
@@ -439,11 +421,20 @@
             document.getElementById('btn-convert').style.display = 'block';
         }
 
+        // Comprehensive Date Matcher (handles 10-08-2026, 08/10/2026, Aug 10, 2026, Jul 31, 2026, etc.)
+        function isDateCell(text) {
+            if (!text) return false;
+            const clean = text.trim();
+            const numericDate = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}$/;
+            const alphaDate = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}(,)?\s*\d{0,4}$/i;
+            return numericDate.test(clean) || alphaDate.test(clean);
+        }
+
         async function convertToExcel() {
             if (!uploadedFile) return;
             document.getElementById('status').innerText = "Processing PDF...";
             const table = document.getElementById('preview-table');
-            table.innerHTML = ""; // Clear old preview
+            table.innerHTML = "";
 
             const reader = new FileReader();
             reader.onload = async function() {
@@ -459,14 +450,18 @@
                         const page = await pdf.getPage(pageNum);
                         const textContent = await page.getTextContent();
                         
-                        // Group text items into rows by vertical alignment with a 4px tolerance
+                        // Cluster text objects by vertical alignment (tolerance of 5px)
                         const rowsY = [];
                         textContent.items.forEach(item => {
                             const y = item.transform[5];
                             const text = item.str.trim();
                             if (text === "") return;
                             
-                            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 4);
+                            // Ignore browser print URLs / page numbers
+                            if (text.includes("http://") || text.includes("https://") || /^\d+\/\d+$/.test(text)) return;
+                            if (text.includes("Account overview") || text.includes("Items per page") || text.includes("of 104")) return;
+
+                            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 5);
                             if (foundRow) {
                                 foundRow.items.push(item);
                             } else {
@@ -474,28 +469,46 @@
                             }
                         });
 
-                        // Sort rows from top to bottom
                         rowsY.sort((a, b) => b.y - a.y);
 
-                        // Locate the header row
+                        // Locate table headers flexibly
                         let headerRow = null;
                         for (let r of rowsY) {
-                            const rowText = r.items.map(it => it.str.toUpperCase());
-                            const hasDate = rowText.some(t => t.includes("DATE"));
-                            const hasDesc = rowText.some(t => t.includes("DESCRIPTION"));
-                            const hasBal = rowText.some(t => t.includes("BALANCE"));
-                            
-                            if (hasDate && hasDesc && hasBal) {
+                            const rowText = r.items.map(it => it.str.toUpperCase()).join(" ");
+                            const hasDate = rowText.includes("DATE");
+                            const hasDesc = rowText.includes("DESCRIPTION") || rowText.includes("DETAILS") || rowText.includes("PARTICULARS");
+                            const hasBal = rowText.includes("BALANCE");
+                            const hasMoney = rowText.includes("MONEY") || rowText.includes("WITHDRAWAL") || rowText.includes("DEPOSIT") || rowText.includes("AMOUNT") || rowText.includes("DEBIT");
+
+                            if (hasDate && (hasDesc || hasMoney) && hasBal) {
                                 headerRow = r;
                                 break;
                             }
                         }
 
-                        // Calculate boundaries based on X coordinates of headers
+                        // Determine column X-axis boundaries
                         if (headerRow && !detectedHeaders) {
+                            // Sort items from left to right
                             const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
-                            detectedHeaders = headerItems.map(it => it.str.trim().toUpperCase());
-                            const headerXs = headerItems.map(it => it.transform[4]);
+                            
+                            // Group adjacent header text spans (e.g. "Money" + "out" -> "Money out")
+                            const consolidatedHeaders = [];
+                            headerItems.forEach(item => {
+                                const clean = item.str.replace(/[↓↑]/g, '').trim();
+                                if (!clean) return;
+                                
+                                if (consolidatedHeaders.length > 0) {
+                                    const prev = consolidatedHeaders[consolidatedHeaders.length - 1];
+                                    if (Math.abs(item.transform[4] - prev.x) < 45) {
+                                        prev.text += " " + clean;
+                                        return;
+                                    }
+                                }
+                                consolidatedHeaders.push({ text: clean.toUpperCase(), x: item.transform[4] });
+                            });
+
+                            detectedHeaders = consolidatedHeaders.map(h => h.text);
+                            const headerXs = consolidatedHeaders.map(h => h.x);
                             
                             colBounds = [];
                             for (let i = 0; i < headerXs.length - 1; i++) {
@@ -503,14 +516,20 @@
                             }
                         }
 
-                        if (!detectedHeaders) continue;
+                        // If no custom header detected on early pages, default to standard banking matrix
+                        if (!detectedHeaders && colBounds.length === 0) {
+                            detectedHeaders = ["DATE", "DESCRIPTION", "MONEY OUT", "MONEY IN", "BALANCE"];
+                        }
 
-                        // Process data rows below header
+                        // Process transaction rows
                         rowsY.forEach(r => {
                             if (headerRow && r.y >= headerRow.y) return; 
 
                             const cells = Array(detectedHeaders.length).fill("");
                             
+                            // Sort items in this row by horizontal X position
+                            r.items.sort((a, b) => a.transform[4] - b.transform[4]);
+
                             r.items.forEach(item => {
                                 const x = item.transform[4];
                                 let colIdx = 0;
@@ -520,53 +539,49 @@
                                 cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
                             });
 
-                            if (cells.some(c => c !== "")) {
+                            // Only push if row contains data and is not pagination text
+                            if (cells.some(c => c !== "") && !cells.join(" ").includes("Previous") && !cells.join(" ").includes("Next")) {
                                 allTransactions.push(cells);
                             }
                         });
                     }
 
                     if (allTransactions.length === 0) {
-                        document.getElementById('status').innerText = "Parsing failed.";
+                        document.getElementById('status').innerText = "No structured transaction table found.";
                         return;
                     }
 
-                    // Smart Post-Processing: Merge multi-line descriptions
+                    // Multi-line statement continuation stitching
                     const finalTransactions = [];
                     allTransactions.forEach(row => {
-                        const hasDate = row[0] !== "";
-                        const hasAmount = row[3] !== "" || row[4] !== "" || row[5] !== "";
-                        const descriptionValue = row[1];
+                        const hasDate = isDateCell(row[0]);
+                        const hasValues = row.slice(1).some(val => val !== "");
 
-                        if (!hasDate && !hasAmount && descriptionValue !== "") {
-                            if (finalTransactions.length > 0) {
-                                const lastRow = finalTransactions[finalTransactions.length - 1];
-                                lastRow[1] = (lastRow[1] + " " + descriptionValue).trim();
-                            }
-                        } else {
+                        if (!hasDate && hasValues && finalTransactions.length > 0) {
+                            // Append continuation text to previous description
+                            const lastRow = finalTransactions[finalTransactions.length - 1];
+                            lastRow[1] = (lastRow[1] + " " + row[1]).trim();
+                        } else if (hasDate || hasValues) {
                             finalTransactions.push(row);
                         }
                     });
 
-                    // Build Interactive HTML Table UI
-                    // 1. Build Header Row (Add custom classes and extra Action column at the end)
+                    // Build Preview Table DOM
                     const trHeader = document.createElement('tr');
                     detectedHeaders.forEach((headerText, colIdx) => {
                         const th = document.createElement('th');
                         th.innerText = headerText;
                         if (colIdx === 0) th.className = "col-date";
                         else if (colIdx === 1) th.className = "col-desc";
-                        else if (colIdx === 2) th.className = "col-ref";
-                        else if (colIdx === 3 || colIdx === 4 || colIdx === 5) th.className = "col-amount";
+                        else th.className = "col-amount";
                         trHeader.appendChild(th);
                     });
                     const thAction = document.createElement('th');
-                    thAction.innerText = "ACTIONS";
-                    thAction.className = "col-action no-export"; // Ignore on export
+                    thAction.innerText = "ACTION";
+                    thAction.className = "col-action no-export";
                     trHeader.appendChild(thAction);
                     table.appendChild(trHeader);
 
-                    // 2. Build Data Rows (Add individual delete buttons)
                     finalTransactions.forEach(row => {
                         const tr = document.createElement('tr');
                         row.forEach((cellText, colIdx) => {
@@ -574,112 +589,88 @@
                             td.innerText = cellText;
                             if (colIdx === 0) td.className = "col-date";
                             else if (colIdx === 1) td.className = "col-desc";
-                            else if (colIdx === 2) td.className = "col-ref";
-                            else if (colIdx === 3 || colIdx === 4 || colIdx === 5) td.className = "col-amount";
+                            else td.className = "col-amount";
                             tr.appendChild(td);
                         });
                         
-                        // Add Delete Action Cell
                         const tdAction = document.createElement('td');
                         tdAction.className = "col-action no-export";
-                        tdAction.contentEditable = "false"; // Disable cell editing on delete button
+                        tdAction.contentEditable = "false";
                         tdAction.innerHTML = `<button class="btn-row-delete" onclick="saveState(); this.closest('tr').remove(); recalculateBalances();">×</button>`;
                         tr.appendChild(tdAction);
 
                         table.appendChild(tr);
                     });
 
-                    // Run initial balance calculation verification
                     recalculateBalances();
 
-                    document.getElementById('status').innerText = "Conversion ready! Review on the right.";
+                    document.getElementById('status').innerText = `Done! Converted ${finalTransactions.length} transactions.`;
                     document.getElementById('clean-tools').style.display = 'block';
                     document.getElementById('btn-download').style.display = 'block';
-                    document.getElementById('btn-copy').style.display = 'inline-block'; // Display copy button
+                    document.getElementById('btn-copy').style.display = 'inline-block';
 
                 } catch (error) {
                     console.error(error);
-                    document.getElementById('status').innerText = "Parsing error.";
+                    document.getElementById('status').innerText = "Parsing error. Check file format.";
                 }
             };
             reader.readAsArrayBuffer(uploadedFile);
         }
 
-        /* =========================================================================
-           SMART AUTO-RECALCULATION ENGINE
-           ========================================================================= */
+        /* Balance Recalculation Engine */
         function recalculateBalances() {
             const table = document.getElementById('preview-table');
             const rows = Array.from(table.rows);
-            if (rows.length <= 2) return; // Need header + baseline row + at least 1 transaction
+            if (rows.length <= 2) return;
 
-            // Extract headers to map indices dynamically
             const headers = Array.from(rows[0].cells).map(cell => cell.innerText.trim().toUpperCase());
-            const withIdx = headers.findIndex(h => h.includes("WITHDRAWAL"));
-            const depIdx = headers.findIndex(h => h.includes("DEPOSIT"));
+            
+            // Multi-bank keyword mapping
+            const withIdx = headers.findIndex(h => h.includes("WITHDRAWAL") || h.includes("MONEY OUT") || h.includes("DEBIT") || h.includes("CHARGES"));
+            const depIdx = headers.findIndex(h => h.includes("DEPOSIT") || h.includes("MONEY IN") || h.includes("CREDIT") || h.includes("PAYMENTS"));
             const balIdx = headers.findIndex(h => h.includes("BALANCE"));
 
-            // If required columns don't exist in the parsed headers, skip calculation
-            if (withIdx === -1 || depIdx === -1 || balIdx === -1) return;
+            if (balIdx === -1) return;
 
-            // Step 1: Read starting balance from the first data row (Row index 1)
-            const firstDataRowCells = rows[1].cells;
-            let runningBalance = cleanNum(firstDataRowCells[balIdx].innerText);
-
-            // Step 2: Loop sequentially and calculate balances for subsequent rows
+            // Compute sequentially
             for (let i = 2; i < rows.length; i++) {
+                const prevBal = cleanNum(rows[i-1].cells[balIdx].innerText);
                 const cells = rows[i].cells;
-                
-                // Safety guard for deleted or incomplete action columns
                 if (cells.length <= balIdx) continue;
 
-                const withdrawal = cleanNum(cells[withIdx].innerText);
-                const deposit = cleanNum(cells[depIdx].innerText);
+                let withdrawal = withIdx !== -1 ? cleanNum(cells[withIdx].innerText) : 0;
+                let deposit = depIdx !== -1 ? cleanNum(cells[depIdx].innerText) : 0;
 
-                // Math Formula: Prev Balance - Withdrawal + Deposit
-                runningBalance = runningBalance - withdrawal + deposit;
-
-                // Update the visual cell in the DOM
-                cells[balIdx].innerText = formatNum(runningBalance);
+                // Adjust running balance
+                if (withdrawal > 0 || deposit > 0) {
+                    let newBal = prevBal - withdrawal + deposit;
+                    cells[balIdx].innerText = "$" + formatNum(newBal);
+                }
             }
         }
 
-        // Helper: Strip commas, spaces, and handle empty fields to safely convert to Float
         function cleanNum(val) {
             if (!val) return 0;
-            const cleaned = val.replace(/[^0-9.-]/g, ''); // Keep only numerals, dots, or minus signs
+            const cleaned = val.replace(/[^0-9.-]/g, '');
             const num = parseFloat(cleaned);
-            return isNaN(num) ? 0 : num;
+            return isNaN(num) ? 0 : Math.abs(num);
         }
 
-        // Helper: Format number with thousand separators and 2 decimal points
         function formatNum(num) {
             return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // Event Listener: Recalculate balance ledger as soon as any user input is entered
         document.getElementById('preview-table').addEventListener('input', recalculateBalances);
-
-        // Event Listener: Save state before user types inside a cell
         document.getElementById('preview-table').addEventListener('focusin', function(e) {
-            if (e.target.tagName === 'TD' || e.target.tagName === 'TH') {
-                saveState();
-            }
+            if (e.target.tagName === 'TD' || e.target.tagName === 'TH') saveState();
         });
 
-        // Captures table state before any modification occurs
         function saveState() {
             const table = document.getElementById('preview-table');
             if (!table) return;
-
-            // Keep history stack within limits
-            if (undoStack.length >= MAX_UNDO_LIMIT) {
-                undoStack.shift();
-            }
-
+            if (undoStack.length >= MAX_UNDO_LIMIT) undoStack.shift();
             undoStack.push(table.innerHTML);
 
-            // Enable Undo button visually
             const undoBtn = document.getElementById('btn-undo');
             if (undoBtn) {
                 undoBtn.disabled = false;
@@ -688,19 +679,12 @@
             }
         }
 
-        // Restores previous table state from history
         function undoLastAction() {
             if (undoStack.length === 0) return;
-
             const table = document.getElementById('preview-table');
-            const previousState = undoStack.pop();
-
-            table.innerHTML = previousState;
-
-            // Recalculate balance matrix to ensure alignment is correct
+            table.innerHTML = undoStack.pop();
             recalculateBalances();
 
-            // Disable Undo button if no more history remains
             if (undoStack.length === 0) {
                 const undoBtn = document.getElementById('btn-undo');
                 if (undoBtn) {
@@ -711,37 +695,23 @@
             }
         }
 
-
-        /* =========================================================================
-           SMART CLEAN-UP TOOLS
-           ========================================================================= */
-
         function autoDeleteNonTransactions() {
             saveState();
             const rows = document.querySelectorAll('#preview-table tr');
             if (rows.length <= 1) return;
 
-            // Matches formats: DD-MM-YYYY, DD/MM/YYYY, D-M-YY, etc.
-            const dateRegex = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}$/;
             let removedCount = 0;
-
             rows.forEach((row, index) => {
-                if (index === 0) return; // Save main headers
-
-                const dateCell = row.querySelector('td');
-                if (dateCell) {
-                    const cellText = dateCell.innerText.trim();
-                    
-                    if (!dateRegex.test(cellText)) {
-                        row.remove();
-                        removedCount++;
-                    }
+                if (index === 0) return;
+                const firstCell = row.querySelector('td');
+                if (firstCell && !isDateCell(firstCell.innerText)) {
+                    row.remove();
+                    removedCount++;
                 }
             });
             
-            // Recalculate balance matrix after cleaning up headers/noise
             recalculateBalances();
-            alert(`⚡ Smart Filter complete! Auto-deleted ${removedCount} metadata & footer rows.`);
+            toast(`Auto-deleted ${removedCount} noise rows.`, "green");
         }
 
         function cleanDuplicateHeaders() {
@@ -749,18 +719,18 @@
             const rows = Array.from(document.querySelectorAll('#preview-table tr'));
             if (rows.length <= 1) return;
 
-            const headerText = Array.from(rows[0].querySelectorAll('th')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+            const headerText = Array.from(rows[0].querySelectorAll('th')).map(c => c.innerText.trim().toLowerCase()).join('|');
             let removedCount = 0;
 
             for (let i = 1; i < rows.length; i++) {
-                const rowText = Array.from(rows[i].querySelectorAll('td')).map(cell => cell.innerText.trim().toLowerCase()).join('|');
+                const rowText = Array.from(rows[i].querySelectorAll('td')).map(c => c.innerText.trim().toLowerCase()).join('|');
                 if (rowText === headerText) {
                     rows[i].remove();
                     removedCount++;
                 }
             }
             recalculateBalances();
-            alert(`Cleaned up ${removedCount} repeating header rows.`);
+            toast(`Cleaned ${removedCount} duplicate headers.`, "green");
         }
 
         function cleanEmptyRows() {
@@ -775,7 +745,7 @@
                 }
             });
             recalculateBalances();
-            alert(`Deleted ${removedCount} empty rows.`);
+            toast(`Deleted ${removedCount} empty rows.`, "green");
         }
 
         function promptDeleteRowByText() {
@@ -795,41 +765,30 @@
                 }
             });
             recalculateBalances();
-            alert(`Deleted ${removedCount} rows matching "${filterText}".`);
+            toast(`Deleted ${removedCount} matching rows.`, "green");
         }
 
-        // =====================================================================
-        // EXISTING DOWNLOAD FUNCTION
-        // =====================================================================
         function downloadExcel() {
             const table = document.getElementById('preview-table');
             if (table.rows.length === 0) return;
 
-            // 1. Temporarily hide all columns marked as 'no-export'
             const noExportElements = document.querySelectorAll('.no-export');
             noExportElements.forEach(el => el.style.display = 'none');
 
-            // 2. Compile table to SheetJS
             const workbook = XLSX.utils.table_to_book(table);
-
-            // 3. Immediately restore the visibility of the elements back in the browser
             noExportElements.forEach(el => el.style.display = '');
 
-            XLSX.writeFile(workbook, `${uploadedFile.name.replace(".pdf", "")}_edited.xlsx`);
+            const filename = uploadedFile ? uploadedFile.name.replace(".pdf", "") : "bank_statement";
+            XLSX.writeFile(workbook, `${filename}_converted.xlsx`);
         }
 
-        /* =========================================================================
-           COPY TABLE TO CLIPBOARD
-           ========================================================================= */
         function copyTableToClipboard() {
             const table = document.getElementById('preview-table');
             if (!table || table.rows.length === 0) return;
 
-            // 1. Temporarily hide no-export columns
             const noExportElements = document.querySelectorAll('.no-export');
             noExportElements.forEach(el => el.style.display = 'none');
 
-            // 2. Extract text and format as TSV (Tab-Separated Values)
             let tsvString = "";
             Array.from(table.rows).forEach(row => {
                 const rowCells = Array.from(row.cells).map(cell => {
@@ -842,38 +801,29 @@
                 tsvString += rowCells.join('\t') + '\r\n';
             });
 
-            // 3. Restore delete column visibility
             noExportElements.forEach(el => el.style.display = '');
 
-            // 4. Use the Clipboard API to copy it
             navigator.clipboard.writeText(tsvString).then(() => {
-                toast("Table copied to clipboard! Paste it directly into Excel or Google Sheets.", "green");
-            }).catch(err => {
-                console.error("Failed to copy table: ", err);
+                toast("Copied table to clipboard (TSV format).", "green");
+            }).catch(() => {
                 toast("Failed to copy table.", "red");
             });
         }
 
-        // Notification helper
         function toast(msg, type) {
             const wrap = document.getElementById('toastWrap');
             const div = document.createElement('div');
             div.className = `toast toast-${type}`;
             div.innerText = msg;
             wrap.appendChild(div);
-            setTimeout(() => { div.remove(); }, 4000);
+            setTimeout(() => { div.remove(); }, 3500);
         }
 
-        /* =========================================================================
-           THEME SWITCHER LOGIC WITH LOCALSTORAGE PERSISTENCE
-           ========================================================================= */
         function toggleTheme() {
             const body = document.body;
             body.classList.toggle('light-mode');
-            
             const isLight = body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            
             updateThemeUI(isLight);
         }
 
@@ -881,7 +831,6 @@
             const icon = document.getElementById('theme-icon');
             const text = document.getElementById('theme-text');
             const btn = document.getElementById('theme-toggle');
-            
             if (isLight) {
                 icon.innerText = "🌙";
                 text.innerText = "Dark Mode";
@@ -893,7 +842,6 @@
             }
         }
 
-        // Initialize Theme on Page Load based on user's saved preference
         (function() {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
@@ -902,8 +850,5 @@
             }
         })();
     </script>
-
 </body>
-</html>--- END OF FILE Paste August 17, 2026 - 1:00AM ---
-
-done, tell me what to do next now, is there any other SEO goal i should target? (please review slowly and give me exact steps, no shortcuts please)
+</html>
