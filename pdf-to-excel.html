@@ -421,13 +421,24 @@
             document.getElementById('btn-convert').style.display = 'block';
         }
 
-        // Comprehensive Date Matcher (handles 10-08-2026, 08/10/2026, Aug 10, 2026, Jul 31, 2026, etc.)
-        function isDateCell(text) {
-            if (!text) return false;
-            const clean = text.trim();
-            const numericDate = /^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}$/;
-            const alphaDate = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}(,)?\s*\d{0,4}$/i;
-            return numericDate.test(clean) || alphaDate.test(clean);
+        // Recognizes Month Day, Year (Aug 10, 2026), MM/DD/YYYY, DD-MM-YYYY
+        function startsWithDate(str) {
+            if (!str) return false;
+            const t = str.trim();
+            const alphaMatch = /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2}(,)?(\s+\d{2,4})?/i;
+            const numMatch = /^\d{1,2}[-\/.]\d{1,2}([-\/.]\d{2,4})?/;
+            return alphaMatch.test(t) || numMatch.test(t);
+        }
+
+        function cleanNum(val) {
+            if (!val) return 0;
+            const cleaned = val.replace(/[^0-9.-]/g, '');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : Math.abs(num);
+        }
+
+        function formatNum(num) {
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         async function convertToExcel() {
@@ -442,140 +453,159 @@
                 
                 try {
                     const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    const allTransactions = [];
-                    let detectedHeaders = null;
-                    let colBounds = [];
+                    const rawRows = [];
+                    let headerPositions = null;
 
+                    // Pass 1: Extract all text items grouped into rows by vertical alignment (Y coord)
                     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                         const page = await pdf.getPage(pageNum);
                         const textContent = await page.getTextContent();
-                        
-                        // Cluster text objects by vertical alignment (tolerance of 5px)
-                        const rowsY = [];
+                        const viewport = page.getViewport({ scale: 1.0 });
+                        const pageWidth = viewport.width;
+
+                        const pageRows = [];
                         textContent.items.forEach(item => {
                             const y = item.transform[5];
-                            const text = item.str.trim();
-                            if (text === "") return;
-                            
-                            // Ignore browser print URLs / page numbers
-                            if (text.includes("http://") || text.includes("https://") || /^\d+\/\d+$/.test(text)) return;
-                            if (text.includes("Account overview") || text.includes("Items per page") || text.includes("of 104")) return;
+                            const x = item.transform[4];
+                            let text = item.str.replace(/[↓↑]/g, '').trim();
+                            if (!text) return;
 
-                            let foundRow = rowsY.find(r => Math.abs(r.y - y) < 5);
-                            if (foundRow) {
-                                foundRow.items.push(item);
+                            // Filter web print noise (URLs, timestamps, pagination)
+                            if (text.includes("http://") || text.includes("https://") || text.includes("Account overview") || text.includes("Items per page")) return;
+                            if (/^\d+\/\d+$/.test(text) || text.includes("of 104") || text === "Previous" || text === "Next") return;
+
+                            let existingRow = pageRows.find(r => Math.abs(r.y - y) < 6);
+                            if (existingRow) {
+                                existingRow.items.push({ text, x });
                             } else {
-                                rowsY.push({ y: y, items: [item] });
+                                pageRows.push({ y, items: [{ text, x }] });
                             }
                         });
 
-                        rowsY.sort((a, b) => b.y - a.y);
+                        // Sort top-to-bottom
+                        pageRows.sort((a, b) => b.y - a.y);
 
-                        // Locate table headers flexibly
-                        let headerRow = null;
-                        for (let r of rowsY) {
-                            const rowText = r.items.map(it => it.str.toUpperCase()).join(" ");
-                            const hasDate = rowText.includes("DATE");
-                            const hasDesc = rowText.includes("DESCRIPTION") || rowText.includes("DETAILS") || rowText.includes("PARTICULARS");
-                            const hasBal = rowText.includes("BALANCE");
-                            const hasMoney = rowText.includes("MONEY") || rowText.includes("WITHDRAWAL") || rowText.includes("DEPOSIT") || rowText.includes("AMOUNT") || rowText.includes("DEBIT");
+                        // Locate table headers across pages
+                        pageRows.forEach(r => {
+                            r.items.sort((a, b) => a.x - b.x);
+                            const rowString = r.items.map(i => i.text.toUpperCase()).join(" ");
 
-                            if (hasDate && (hasDesc || hasMoney) && hasBal) {
-                                headerRow = r;
-                                break;
-                            }
-                        }
-
-                        // Determine column X-axis boundaries
-                        if (headerRow && !detectedHeaders) {
-                            // Sort items from left to right
-                            const headerItems = headerRow.items.sort((a, b) => a.transform[4] - b.transform[4]);
-                            
-                            // Group adjacent header text spans (e.g. "Money" + "out" -> "Money out")
-                            const consolidatedHeaders = [];
-                            headerItems.forEach(item => {
-                                const clean = item.str.replace(/[↓↑]/g, '').trim();
-                                if (!clean) return;
-                                
-                                if (consolidatedHeaders.length > 0) {
-                                    const prev = consolidatedHeaders[consolidatedHeaders.length - 1];
-                                    if (Math.abs(item.transform[4] - prev.x) < 45) {
-                                        prev.text += " " + clean;
-                                        return;
-                                    }
+                            if (rowString.includes("DATE") && (rowString.includes("DESCRIPTION") || rowString.includes("DETAILS")) && rowString.includes("BALANCE")) {
+                                if (!headerPositions) {
+                                    // Capture dynamic X-axis positions from actual header tokens
+                                    const dateItem = r.items.find(i => i.text.toUpperCase().includes("DATE"));
+                                    const descItem = r.items.find(i => i.text.toUpperCase().includes("DESC"));
+                                    const balItem = r.items.find(i => i.text.toUpperCase().includes("BAL"));
+                                    
+                                    headerPositions = {
+                                        dateX: dateItem ? dateItem.x : 40,
+                                        descX: descItem ? descItem.x : 130,
+                                        midX: pageWidth * 0.55,
+                                        inX: pageWidth * 0.70,
+                                        balX: balItem ? balItem.x : pageWidth * 0.85,
+                                        pageWidth: pageWidth
+                                    };
                                 }
-                                consolidatedHeaders.push({ text: clean.toUpperCase(), x: item.transform[4] });
-                            });
-
-                            detectedHeaders = consolidatedHeaders.map(h => h.text);
-                            const headerXs = consolidatedHeaders.map(h => h.x);
-                            
-                            colBounds = [];
-                            for (let i = 0; i < headerXs.length - 1; i++) {
-                                colBounds.push((headerXs[i] + headerXs[i+1]) / 2);
+                                return; // Skip pushing the header itself as a transaction
                             }
-                        }
 
-                        // If no custom header detected on early pages, default to standard banking matrix
-                        if (!detectedHeaders && colBounds.length === 0) {
-                            detectedHeaders = ["DATE", "DESCRIPTION", "MONEY OUT", "MONEY IN", "BALANCE"];
-                        }
-
-                        // Process transaction rows
-                        rowsY.forEach(r => {
-                            if (headerRow && r.y >= headerRow.y) return; 
-
-                            const cells = Array(detectedHeaders.length).fill("");
-                            
-                            // Sort items in this row by horizontal X position
-                            r.items.sort((a, b) => a.transform[4] - b.transform[4]);
-
-                            r.items.forEach(item => {
-                                const x = item.transform[4];
-                                let colIdx = 0;
-                                while (colIdx < colBounds.length && x > colBounds[colIdx]) {
-                                    colIdx++;
-                                }
-                                cells[colIdx] = (cells[colIdx] + " " + item.str).trim();
-                            });
-
-                            // Only push if row contains data and is not pagination text
-                            if (cells.some(c => c !== "") && !cells.join(" ").includes("Previous") && !cells.join(" ").includes("Next")) {
-                                allTransactions.push(cells);
-                            }
+                            // Collect transaction candidate rows
+                            rawRows.push(r);
                         });
                     }
 
-                    if (allTransactions.length === 0) {
-                        document.getElementById('status').innerText = "No structured transaction table found.";
-                        return;
+                    // Fallback column positions if PDF did not contain standard header row text
+                    if (!headerPositions) {
+                        headerPositions = {
+                            dateX: 40,
+                            descX: 130,
+                            midX: 320,
+                            inX: 420,
+                            balX: 500,
+                            pageWidth: 600
+                        };
                     }
 
-                    // Multi-line statement continuation stitching
+                    // Pass 2: Parse items into columns [Date, Description, Money Out, Money In, Balance]
+                    const parsedTransactions = [];
+
+                    rawRows.forEach(r => {
+                        const items = r.items;
+                        const rowFullText = items.map(i => i.text).join(" ");
+                        
+                        // Ignore metadata boxes like summary cards
+                        if (rowFullText.includes("Current balance") || rowFullText.includes("Available balance") || rowFullText.includes("Showing:") || rowFullText.includes("TRANSFER") || rowFullText.includes("INTERAC")) return;
+
+                        let date = "";
+                        let desc = "";
+                        let moneyOut = "";
+                        let moneyIn = "";
+                        let balance = "";
+
+                        items.forEach(item => {
+                            const x = item.x;
+                            const text = item.text;
+
+                            if (x < headerPositions.descX - 10) {
+                                date = (date + " " + text).trim();
+                            } else if (x < headerPositions.midX - 10) {
+                                desc = (desc + " " + text).trim();
+                            } else if (x < headerPositions.inX - 10) {
+                                // Money out (Withdrawal / -)
+                                moneyOut = (moneyOut + " " + text).trim();
+                            } else if (x < headerPositions.balX - 15) {
+                                // Money in (Deposit / +)
+                                moneyIn = (moneyIn + " " + text).trim();
+                            } else {
+                                // Balance
+                                balance = (balance + " " + text).trim();
+                            }
+                        });
+
+                        // Verify if row contains any transaction data
+                        if (date || desc || moneyOut || moneyIn || balance) {
+                            // Smart routing for statements that place single amounts with + or - signs
+                            if (moneyOut.startsWith("+") && !moneyIn) {
+                                moneyIn = moneyOut;
+                                moneyOut = "";
+                            }
+
+                            parsedTransactions.push([date, desc, moneyOut, moneyIn, balance]);
+                        }
+                    });
+
+                    // Pass 3: Combine multi-line descriptions
                     const finalTransactions = [];
-                    allTransactions.forEach(row => {
-                        const hasDate = isDateCell(row[0]);
-                        const hasValues = row.slice(1).some(val => val !== "");
+                    parsedTransactions.forEach(row => {
+                        const isDate = startsWithDate(row[0]);
+                        const hasAmounts = row[2] || row[3] || row[4];
 
-                        if (!hasDate && hasValues && finalTransactions.length > 0) {
-                            // Append continuation text to previous description
-                            const lastRow = finalTransactions[finalTransactions.length - 1];
-                            lastRow[1] = (lastRow[1] + " " + row[1]).trim();
-                        } else if (hasDate || hasValues) {
+                        if (!isDate && !hasAmounts && row[1] && finalTransactions.length > 0) {
+                            // Append second line description to previous record
+                            const prev = finalTransactions[finalTransactions.length - 1];
+                            prev[1] = (prev[1] + " " + row[1]).trim();
+                        } else if (isDate || hasAmounts) {
                             finalTransactions.push(row);
                         }
                     });
 
-                    // Build Preview Table DOM
+                    if (finalTransactions.length === 0) {
+                        document.getElementById('status').innerText = "No transaction data could be matched.";
+                        return;
+                    }
+
+                    // Pass 4: Render Spreadsheet Table
+                    const headers = ["DATE", "DESCRIPTION", "MONEY OUT", "MONEY IN", "BALANCE"];
                     const trHeader = document.createElement('tr');
-                    detectedHeaders.forEach((headerText, colIdx) => {
+                    headers.forEach((h, idx) => {
                         const th = document.createElement('th');
-                        th.innerText = headerText;
-                        if (colIdx === 0) th.className = "col-date";
-                        else if (colIdx === 1) th.className = "col-desc";
+                        th.innerText = h;
+                        if (idx === 0) th.className = "col-date";
+                        else if (idx === 1) th.className = "col-desc";
                         else th.className = "col-amount";
                         trHeader.appendChild(th);
                     });
+                    
                     const thAction = document.createElement('th');
                     thAction.innerText = "ACTION";
                     thAction.className = "col-action no-export";
@@ -584,15 +614,15 @@
 
                     finalTransactions.forEach(row => {
                         const tr = document.createElement('tr');
-                        row.forEach((cellText, colIdx) => {
+                        row.forEach((cellText, idx) => {
                             const td = document.createElement('td');
                             td.innerText = cellText;
-                            if (colIdx === 0) td.className = "col-date";
-                            else if (colIdx === 1) td.className = "col-desc";
+                            if (idx === 0) td.className = "col-date";
+                            else if (idx === 1) td.className = "col-desc";
                             else td.className = "col-amount";
                             tr.appendChild(td);
                         });
-                        
+
                         const tdAction = document.createElement('td');
                         tdAction.className = "col-action no-export";
                         tdAction.contentEditable = "false";
@@ -604,35 +634,32 @@
 
                     recalculateBalances();
 
-                    document.getElementById('status').innerText = `Done! Converted ${finalTransactions.length} transactions.`;
+                    document.getElementById('status').innerText = `Converted ${finalTransactions.length} transactions successfully!`;
                     document.getElementById('clean-tools').style.display = 'block';
                     document.getElementById('btn-download').style.display = 'block';
                     document.getElementById('btn-copy').style.display = 'inline-block';
 
-                } catch (error) {
-                    console.error(error);
-                    document.getElementById('status').innerText = "Parsing error. Check file format.";
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById('status').innerText = "Error parsing PDF file.";
                 }
             };
             reader.readAsArrayBuffer(uploadedFile);
         }
 
-        /* Balance Recalculation Engine */
+        /* Recalculate Balance Engine */
         function recalculateBalances() {
             const table = document.getElementById('preview-table');
             const rows = Array.from(table.rows);
             if (rows.length <= 2) return;
 
             const headers = Array.from(rows[0].cells).map(cell => cell.innerText.trim().toUpperCase());
-            
-            // Multi-bank keyword mapping
-            const withIdx = headers.findIndex(h => h.includes("WITHDRAWAL") || h.includes("MONEY OUT") || h.includes("DEBIT") || h.includes("CHARGES"));
-            const depIdx = headers.findIndex(h => h.includes("DEPOSIT") || h.includes("MONEY IN") || h.includes("CREDIT") || h.includes("PAYMENTS"));
+            const withIdx = headers.findIndex(h => h.includes("WITHDRAWAL") || h.includes("MONEY OUT") || h.includes("DEBIT"));
+            const depIdx = headers.findIndex(h => h.includes("DEPOSIT") || h.includes("MONEY IN") || h.includes("CREDIT"));
             const balIdx = headers.findIndex(h => h.includes("BALANCE"));
 
             if (balIdx === -1) return;
 
-            // Compute sequentially
             for (let i = 2; i < rows.length; i++) {
                 const prevBal = cleanNum(rows[i-1].cells[balIdx].innerText);
                 const cells = rows[i].cells;
@@ -641,7 +668,6 @@
                 let withdrawal = withIdx !== -1 ? cleanNum(cells[withIdx].innerText) : 0;
                 let deposit = depIdx !== -1 ? cleanNum(cells[depIdx].innerText) : 0;
 
-                // Adjust running balance
                 if (withdrawal > 0 || deposit > 0) {
                     let newBal = prevBal - withdrawal + deposit;
                     cells[balIdx].innerText = "$" + formatNum(newBal);
@@ -649,17 +675,7 @@
             }
         }
 
-        function cleanNum(val) {
-            if (!val) return 0;
-            const cleaned = val.replace(/[^0-9.-]/g, '');
-            const num = parseFloat(cleaned);
-            return isNaN(num) ? 0 : Math.abs(num);
-        }
-
-        function formatNum(num) {
-            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
+        /* History State & Tools */
         document.getElementById('preview-table').addEventListener('input', recalculateBalances);
         document.getElementById('preview-table').addEventListener('focusin', function(e) {
             if (e.target.tagName === 'TD' || e.target.tagName === 'TH') saveState();
@@ -704,7 +720,7 @@
             rows.forEach((row, index) => {
                 if (index === 0) return;
                 const firstCell = row.querySelector('td');
-                if (firstCell && !isDateCell(firstCell.innerText)) {
+                if (firstCell && !startsWithDate(firstCell.innerText)) {
                     row.remove();
                     removedCount++;
                 }
